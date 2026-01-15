@@ -18,6 +18,12 @@ variable "hosted_zone_id" {
 	type        = string
 }
 
+variable "manage_dns" {
+	description = "Whether to manage DNS records (known at plan time)"
+	type        = bool
+	default     = false
+}
+
 variable "price_class" {
 	description = "CloudFront price class"
 	type        = string

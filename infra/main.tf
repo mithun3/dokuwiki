@@ -9,7 +9,7 @@ terraform {
   }
 
 backend "s3" {
-  bucket         = "sysya-bucket-001"
+  bucket         = "dokuwiki-tfstate-bucket"
   key            = "dokuwiki/terraform.tfstate"
   region         = "ap-southeast-2"
   dynamodb_table = "tf-locks"
@@ -47,7 +47,17 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+# Route53 hosted zone (create or use existing)
+resource "aws_route53_zone" "main" {
+  count = var.create_hosted_zone && var.domain_name != "" ? 1 : 0
+  name  = var.domain_name
+}
+
 locals {
+  # Whether DNS management is enabled (known at plan time)
+  dns_enabled = var.domain_name != "" && (var.create_hosted_zone || var.hosted_zone_id != "")
+  # Use created zone or provided zone ID (only accessed when dns_enabled)
+  effective_hosted_zone_id = var.create_hosted_zone && var.domain_name != "" ? aws_route53_zone.main[0].zone_id : var.hosted_zone_id
   name_prefix = "${var.project_name}-${var.environment}"
 }
 
@@ -76,22 +86,25 @@ module "alb" {
   name        = local.name_prefix
   vpc_id      = module.network.vpc_id
   subnet_ids  = module.network.public_subnet_ids
-  enable_https    = var.hosted_zone_id != "" && length(aws_acm_certificate_validation.main) > 0
+  enable_https    = local.dns_enabled && length(aws_acm_certificate_validation.main) > 0
   certificate_arn  = length(aws_acm_certificate_validation.main) > 0 ? aws_acm_certificate_validation.main[0].certificate_arn : ""
   enable_waf       = false
   waf_web_acl_arn  = ""
 }
 
 module "ecs" {
-  source                = "./modules/ecs_fargate"
-  name                  = local.name_prefix
-  vpc_id                = module.network.vpc_id
-  private_subnet_ids    = module.network.private_subnet_ids
-  container_image       = var.container_image
-  alb_target_group_arn  = module.alb.target_group_arn
-  alb_security_group_id = module.alb.alb_security_group_id
-  efs_file_system_id    = module.efs.file_system_id
-  efs_security_group_id = module.efs.security_group_id
+  source                      = "./modules/ecs_fargate"
+  name                        = local.name_prefix
+  vpc_id                      = module.network.vpc_id
+  private_subnet_ids          = module.network.private_subnet_ids
+  container_image             = var.container_image
+  alb_target_group_arn        = module.alb.target_group_arn
+  alb_security_group_id       = module.alb.alb_security_group_id
+  efs_file_system_id          = module.efs.file_system_id
+  efs_security_group_id       = module.efs.security_group_id
+  efs_access_point_data_id    = module.efs.access_point_data_id
+  efs_access_point_conf_id    = module.efs.access_point_conf_id
+  efs_access_point_plugins_id = module.efs.access_point_plugins_id
   env_vars = {
     PHP_MEMORY_LIMIT = "256M"
     DEMO_USERS       = "0"
@@ -111,7 +124,8 @@ module "media_cdn" {
   name             = local.name_prefix
   bucket_name      = var.media_bucket_name
   domain_name      = var.media_domain_name
-  hosted_zone_id   = var.media_hosted_zone_id != "" ? var.media_hosted_zone_id : var.hosted_zone_id
+  hosted_zone_id   = local.effective_hosted_zone_id
+  manage_dns       = var.media_domain_name != "" && (var.media_hosted_zone_id != "" || var.create_hosted_zone || var.hosted_zone_id != "")
   certificate_arn  = var.media_certificate_arn
 }
 
@@ -133,26 +147,26 @@ resource "aws_acm_certificate" "main" {
 }
 
 resource "aws_route53_record" "cert_validation" {
-  for_each = var.domain_name == "" || var.hosted_zone_id == "" ? {} : {
+  for_each = local.dns_enabled ? {
     for dvo in aws_acm_certificate.main[0].domain_validation_options : dvo.domain_name => dvo
-  }
+  } : {}
 
   name    = each.value.resource_record_name
   type    = each.value.resource_record_type
-  zone_id = var.hosted_zone_id
+  zone_id = local.effective_hosted_zone_id
   records = [each.value.resource_record_value]
   ttl     = 60
 }
 
 resource "aws_acm_certificate_validation" "main" {
-  count                   = var.domain_name == "" || var.hosted_zone_id == "" ? 0 : 1
+  count                   = local.dns_enabled ? 1 : 0
   certificate_arn         = aws_acm_certificate.main[0].arn
   validation_record_fqdns = [for r in aws_route53_record.cert_validation : r.fqdn]
 }
 
 resource "aws_route53_record" "app" {
-  count   = var.domain_name == "" || var.hosted_zone_id == "" ? 0 : 1
-  zone_id = var.hosted_zone_id
+  count   = local.dns_enabled ? 1 : 0
+  zone_id = local.effective_hosted_zone_id
   name    = var.domain_name
   type    = "A"
 
@@ -170,4 +184,13 @@ output "media_bucket" { value = module.media_cdn.bucket_name }
 output "media_cdn_domain" { value = module.media_cdn.cdn_domain }
 output "app_cert_validation_records" {
   value = var.domain_name == "" ? [] : tolist(aws_acm_certificate.main[0].domain_validation_options)
+}
+
+output "hosted_zone_id" {
+  value = local.effective_hosted_zone_id
+}
+
+output "hosted_zone_nameservers" {
+  description = "Nameservers to configure at your domain registrar"
+  value       = var.create_hosted_zone && var.domain_name != "" ? aws_route53_zone.main[0].name_servers : []
 }

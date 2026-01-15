@@ -49,3 +49,64 @@ resource "aws_efs_backup_policy" "this" {
     status = "ENABLED"
   }
 }
+
+# Access points for DokuWiki directories
+resource "aws_efs_access_point" "data" {
+  file_system_id = aws_efs_file_system.this.id
+
+  posix_user {
+    uid = 82  # www-data in Alpine
+    gid = 82
+  }
+
+  root_directory {
+    path = "/data"
+    creation_info {
+      owner_uid   = 82
+      owner_gid   = 82
+      permissions = "0755"
+    }
+  }
+
+  tags = { Name = "${var.name}-efs-data" }
+}
+
+resource "aws_efs_access_point" "conf" {
+  file_system_id = aws_efs_file_system.this.id
+
+  posix_user {
+    uid = 82
+    gid = 82
+  }
+
+  root_directory {
+    path = "/conf"
+    creation_info {
+      owner_uid   = 82
+      owner_gid   = 82
+      permissions = "0755"
+    }
+  }
+
+  tags = { Name = "${var.name}-efs-conf" }
+}
+
+resource "aws_efs_access_point" "plugins" {
+  file_system_id = aws_efs_file_system.this.id
+
+  posix_user {
+    uid = 82
+    gid = 82
+  }
+
+  root_directory {
+    path = "/plugins"
+    creation_info {
+      owner_uid   = 82
+      owner_gid   = 82
+      permissions = "0755"
+    }
+  }
+
+  tags = { Name = "${var.name}-efs-plugins" }
+}

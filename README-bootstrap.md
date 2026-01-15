@@ -317,7 +317,7 @@ Replace the bucket/table ARNs with your own if they differ. Ensure no permission
 Command:
 ```sh
 AWS_PROFILE=my-creds AWS_REGION=ap-southeast-2 \
-STATE_BUCKET=sysya-bucket-001 \
+STATE_BUCKET=dokuwiki-tfstate-bucket \
 STATE_KEY=dokuwiki/terraform.tfstate \
 LOCK_TABLE=tf-locks \
 REGION=ap-southeast-2 \
@@ -328,16 +328,16 @@ Result:
 - Terraform initialized, refreshed existing bucket/table.
 - Recreated public access block (tainted resource) and completed apply.
 - Outputs:
-  - state_bucket: sysya-bucket-001
+  - state_bucket: dokuwiki-tfstate-bucket
   - lock_table: tf-locks
   - backend_snippet:
     ```
     backend "s3" {
-      bucket         = "sysya-bucket-001"
-      key            = "dokuwiki/terraform.tfstate"
-      region         = "ap-southeast-2"
-      dynamodb_table = "tf-locks"
-      encrypt        = true
+        bucket         = "dokuwiki-tfstate-bucket"
+        key            = "dokuwiki/terraform.tfstate"
+        region         = "ap-southeast-2"
+        dynamodb_table = "tf-locks"
+        encrypt        = true
     }
     ```
 
@@ -350,7 +350,7 @@ Only do this after migrating or discarding all state. If the temp tfvars file is
 cat > /tmp/tf-backend-vars.tfvars <<'EOF'
 aws_region        = "ap-southeast-2"
 project_name      = "dokuwiki"
-state_bucket_name = "sysya-bucket-001"
+state_bucket_name = "dokuwiki-tfstate-bucket"
 lock_table_name   = "tf-locks"
 state_key         = "dokuwiki/terraform.tfstate"
 EOF
@@ -364,7 +364,7 @@ This creates S3 + DynamoDB for the backend.
 ```sh
 # run from repo root (so scripts/ is in path)
 # first time only: chmod +x scripts/tf-backend-bootstrap.sh
-STATE_BUCKET=sysya-bucket-001
+STATE_BUCKET=dokuwiki-tfstate-bucket
 STATE_KEY=dokuwiki/terraform.tfstate
 LOCK_TABLE=tf-locks
 REGION=ap-southeast-2
@@ -400,11 +400,11 @@ Update `container_image` (or export `TF_VAR_container_image=$IMAGE_URI`) for Ter
 With backend values passed at runtime (no backend block required):
 ```sh
 cd infra
-AWS_PROFILE=my-creds BACKEND_BUCKET=sysya-bucket-001 BACKEND_KEY=dokuwiki/terraform.tfstate BACKEND_REGION=ap-southeast-2 BACKEND_DDB_TABLE=tf-locks TFVARS=terraform.tfvars ../scripts/tf-apply.sh
+AWS_PROFILE=my-creds BACKEND_BUCKET=dokuwiki-tfstate-bucket BACKEND_KEY=dokuwiki/terraform.tfstate BACKEND_REGION=ap-southeast-2 BACKEND_DDB_TABLE=tf-locks TFVARS=terraform.tfvars ../scripts/tf-apply.sh
 ```
 If you set the backend in `infra/main.tf`, omit the BACKEND_* vars and just run:
 ```sh
-TFVARS=terraform.tfvars ../scripts/tf-apply.sh
+AWS_PROFILE=my-creds TFVARS=terraform.tfvars ../scripts/tf-apply.sh
 ```
 
 ## 7) Verify

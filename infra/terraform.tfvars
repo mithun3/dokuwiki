@@ -8,6 +8,7 @@ private_subnet_cidrs = ["10.0.10.0/24", "10.0.11.0/24"]
 availability_zones   = ["ap-southeast-2a", "ap-southeast-2b"]
 
 domain_name        = "sysya.com.au"
+create_hosted_zone = true
 hosted_zone_id     = ""
 container_image    = "462634386575.dkr.ecr.ap-southeast-2.amazonaws.com/dokuwiki:latest"
 admin_password_ssm_arn = "arn:aws:ssm:ap-southeast-2:462634386575:parameter/dokuwiki/admin_password"

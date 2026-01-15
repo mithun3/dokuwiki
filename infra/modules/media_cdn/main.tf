@@ -1,6 +1,8 @@
 locals {
-  manage_cert    = var.certificate_arn == "" && var.domain_name != "" && var.hosted_zone_id != ""
-  use_custom_cert = var.certificate_arn != ""
+  manage_cert           = var.certificate_arn == "" && var.domain_name != "" && var.manage_dns
+  use_custom_cert       = var.certificate_arn != ""
+  custom_domain_enabled = var.domain_name != "" && (var.certificate_arn != "" || local.manage_cert)
+  viewer_cert_arn       = local.manage_cert ? aws_acm_certificate.cf[0].arn : var.certificate_arn
 }
 
 resource "aws_s3_bucket" "media" {
@@ -83,11 +85,6 @@ resource "aws_acm_certificate_validation" "cf" {
   validation_record_fqdns = [for r in aws_route53_record.cert_validation : r.fqdn]
 }
 
-locals {
-  viewer_cert_arn       = var.certificate_arn
-  custom_domain_enabled = var.domain_name != "" && local.use_custom_cert
-}
-
 resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   comment             = "${var.name} media CDN"
@@ -148,7 +145,7 @@ resource "aws_s3_bucket_policy" "media" {
 }
 
 resource "aws_route53_record" "media" {
-  count   = local.custom_domain_enabled && var.hosted_zone_id != "" ? 1 : 0
+  count   = local.custom_domain_enabled && var.manage_dns ? 1 : 0
   zone_id = var.hosted_zone_id
   name    = var.domain_name
   type    = "A"

@@ -40,7 +40,9 @@ RUN set -eux; \
   rm -f "${DOKUWIKI_PATH}/install.php"; \
   rm /tmp/dokuwiki.tgz; \
   [ -f "${DOKUWIKI_PATH}/doku.php" ]; \
-  chown -R www-data:www-data "${DOKUWIKI_PATH}"
+  chown -R www-data:www-data "${DOKUWIKI_PATH}"; \
+  # Backup built-in plugins so we can restore them after EFS mount
+  cp -a "${DOKUWIKI_PATH}/lib/plugins" /opt/plugins-builtin
 
 # Seed config/content that will be copied to writable volumes on first run
 COPY seed/ /opt/dokuseed/

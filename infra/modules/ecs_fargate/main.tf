@@ -68,8 +68,36 @@ resource "aws_ecs_task_definition" "this" {
   volume {
     name = "efs-data"
     efs_volume_configuration {
-      file_system_id = var.efs_file_system_id
+      file_system_id     = var.efs_file_system_id
       transit_encryption = "ENABLED"
+      authorization_config {
+        access_point_id = var.efs_access_point_data_id
+        iam             = "DISABLED"
+      }
+    }
+  }
+
+  volume {
+    name = "efs-conf"
+    efs_volume_configuration {
+      file_system_id     = var.efs_file_system_id
+      transit_encryption = "ENABLED"
+      authorization_config {
+        access_point_id = var.efs_access_point_conf_id
+        iam             = "DISABLED"
+      }
+    }
+  }
+
+  volume {
+    name = "efs-plugins"
+    efs_volume_configuration {
+      file_system_id     = var.efs_file_system_id
+      transit_encryption = "ENABLED"
+      authorization_config {
+        access_point_id = var.efs_access_point_plugins_id
+        iam             = "DISABLED"
+      }
     }
   }
 
@@ -85,8 +113,8 @@ resource "aws_ecs_task_definition" "this" {
       secrets     = [for k, v in var.secret_env : { name = k, valueFrom = v }]
       mountPoints = [
         { sourceVolume = "efs-data", containerPath = "/var/www/dokuwiki/data", readOnly = false },
-        { sourceVolume = "efs-data", containerPath = "/var/www/dokuwiki/conf", readOnly = false },
-        { sourceVolume = "efs-data", containerPath = "/var/www/dokuwiki/lib/plugins", readOnly = false }
+        { sourceVolume = "efs-conf", containerPath = "/var/www/dokuwiki/conf", readOnly = false },
+        { sourceVolume = "efs-plugins", containerPath = "/var/www/dokuwiki/lib/plugins", readOnly = false }
       ]
       logConfiguration = {
         logDriver = "awslogs"

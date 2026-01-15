@@ -46,8 +46,14 @@ variable "domain_name" {
   default     = ""
 }
 
+variable "create_hosted_zone" {
+  description = "Whether to create a new Route53 hosted zone for the domain"
+  type        = bool
+  default     = false
+}
+
 variable "hosted_zone_id" {
-  description = "Route53 hosted zone ID"
+  description = "Route53 hosted zone ID (leave empty if create_hosted_zone = true)"
   type        = string
   default     = ""
 }

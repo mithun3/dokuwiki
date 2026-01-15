@@ -67,3 +67,18 @@ variable "secret_env" {
 	type        = map(string)
 	default     = {}
 }
+
+variable "efs_access_point_data_id" {
+	description = "EFS Access Point ID for data directory"
+	type        = string
+}
+
+variable "efs_access_point_conf_id" {
+	description = "EFS Access Point ID for conf directory"
+	type        = string
+}
+
+variable "efs_access_point_plugins_id" {
+	description = "EFS Access Point ID for plugins directory"
+	type        = string
+}

@@ -85,21 +85,20 @@ jobs:
             exit 1
           fi
           IMAGE_URI="${ACCOUNT_ID}.dkr.ecr.${BACKEND_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
-          docker build -t "$IMAGE_URI" -f app/Dockerfile app
-          docker push "$IMAGE_URI"
+          docker buildx build --platform linux/amd64 -t "$IMAGE_URI" -f app/Dockerfile app --push
           echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.6
+      # - name: Set up Terraform
+      #   uses: hashicorp/setup-terraform@v3
+      #   with:
+      #     terraform_version: 1.6.6
 
-      - name: Terraform apply with new image
-        env:
-          TFVARS: ${{ env.TFVARS }}
-          BACKEND_BUCKET: ${{ env.BACKEND_BUCKET }}
-          BACKEND_KEY: ${{ env.BACKEND_KEY }}
-          BACKEND_REGION: ${{ env.BACKEND_REGION }}
-          BACKEND_DDB_TABLE: ${{ env.BACKEND_DDB_TABLE }}
-          TF_VAR_container_image: ${{ steps.build_push.outputs.image_uri }}
-        run: ./scripts/tf-apply.sh
+      # - name: Terraform apply with new image
+      #   env:
+      #     TFVARS: ${{ env.TFVARS }}
+      #     BACKEND_BUCKET: ${{ env.BACKEND_BUCKET }}
+      #     BACKEND_KEY: ${{ env.BACKEND_KEY }}
+      #     BACKEND_REGION: ${{ env.BACKEND_REGION }}
+      #     BACKEND_DDB_TABLE: ${{ env.BACKEND_DDB_TABLE }}
+      #     TF_VAR_container_image: ${{ steps.build_push.outputs.image_uri }}
+      #   run: ./scripts/tf-apply.sh

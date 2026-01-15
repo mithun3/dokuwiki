@@ -38,10 +38,18 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_target_group" "http" {
-  name     = "${substr(var.name,0,15)}-tg"
+  # name = "dokuwiki-prod-tg"
+  name_prefix = "a-"
+
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
+
+  target_type = "ip"
+
+  lifecycle {
+    create_before_destroy = true
+  }
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
