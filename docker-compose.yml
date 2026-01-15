@@ -1,0 +1,27 @@
+services:
+  dokuwiki:
+    build: ./app
+    ports:
+      - "8080:80"
+    environment:
+      - PHP_MEMORY_LIMIT=256M
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme}
+      - DEMO_USERS=${DEMO_USERS:-0}
+      - S3_BACKUP_BUCKET=${S3_BACKUP_BUCKET:-}
+      - S3_BACKUP_PREFIX=${S3_BACKUP_PREFIX:-dokuwiki}
+      - S3_BACKUP_ON_START=${S3_BACKUP_ON_START:-0}
+      - S3_BACKUP_CRON=${S3_BACKUP_CRON:-}
+    volumes:
+      # Bind mounts keep git as the single source of truth for pages, media, config, and plugins.
+      - ./app/seed/data:/var/www/dokuwiki/data
+      - ./app/seed/conf:/var/www/dokuwiki/conf
+      - ./app/seed/lib/plugins:/var/www/dokuwiki/lib/plugins
+      # Optional: mount markdown-first authoring if you convert/rsync into data.
+      # - ./content/pages:/var/www/dokuwiki/data/pages:ro
+      # - ./content/media:/var/www/dokuwiki/data/media:ro
+    restart: unless-stopped
+
+volumes:
+  dokuwiki_data:
+  dokuwiki_conf:
+  dokuwiki_plugins:

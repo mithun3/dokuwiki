@@ -1,0 +1,51 @@
+name: Terraform Backend Bootstrap
+
+on:
+  workflow_dispatch:
+    inputs:
+      state_bucket:
+        description: "S3 bucket name for Terraform state"
+        required: true
+      state_key:
+        description: "Object key for the state file"
+        default: "dokuwiki/terraform.tfstate"
+      lock_table:
+        description: "DynamoDB table name for state locking"
+        default: "tf-locks"
+      aws_region:
+        description: "AWS region"
+        default: "us-east-1"
+      project_name:
+        description: "Project tag for backend stack"
+        default: "dokuwiki"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ inputs.aws_region }}
+      STATE_BUCKET: ${{ inputs.state_bucket }}
+      STATE_KEY: ${{ inputs.state_key }}
+      LOCK_TABLE: ${{ inputs.lock_table }}
+      PROJECT: ${{ inputs.project_name }}
+      TF_IN_AUTOMATION: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_BACKEND_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Bootstrap remote backend (S3 + DynamoDB)
+        run: ./scripts/tf-backend-bootstrap.sh

@@ -1,0 +1,105 @@
+name: App Deploy
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "app/**"
+      - "infra/**"
+      - "scripts/**"
+  workflow_dispatch:
+    inputs:
+      ecr_repository:
+        description: "ECR repository name (without account/registry)"
+        default: "dokuwiki"
+      image_tag:
+        description: "Optional image tag (defaults to commit SHA)"
+        default: ""
+      tfvars_path:
+        description: "Path to the tfvars file"
+        default: "infra/terraform.tfvars"
+      backend_bucket:
+        description: "S3 bucket for remote state"
+        default: ""
+      backend_key:
+        description: "Object key for state file"
+        default: "dokuwiki/terraform.tfstate"
+      backend_region:
+        description: "AWS region for the backend"
+        default: "us-east-1"
+      backend_dynamodb_table:
+        description: "DynamoDB table for state locking"
+        default: "tf-locks"
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: app-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  build-and-apply:
+    runs-on: ubuntu-latest
+    env:
+      TFVARS: ${{ inputs.tfvars_path != '' && inputs.tfvars_path || 'infra/terraform.tfvars' }}
+      BACKEND_BUCKET: ${{ inputs.backend_bucket != '' && inputs.backend_bucket || secrets.TF_BACKEND_BUCKET }}
+      BACKEND_KEY: ${{ inputs.backend_key != '' && inputs.backend_key || secrets.TF_BACKEND_KEY || 'dokuwiki/terraform.tfstate' }}
+      BACKEND_REGION: ${{ inputs.backend_region != '' && inputs.backend_region || secrets.TF_BACKEND_REGION || 'us-east-1' }}
+      BACKEND_DDB_TABLE: ${{ inputs.backend_dynamodb_table != '' && inputs.backend_dynamodb_table || secrets.TF_BACKEND_DDB_TABLE }}
+      ECR_REPOSITORY: ${{ inputs.ecr_repository != '' && inputs.ecr_repository || secrets.ECR_REPOSITORY }}
+      IMAGE_TAG_INPUT: ${{ inputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.BACKEND_REGION }}
+
+      - name: Get account ID
+        id: aws_account
+        run: echo "account_id=$(aws sts get-caller-identity --query Account --output text)" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to ECR
+        run: aws ecr get-login-password --region "$BACKEND_REGION" | docker login --username AWS --password-stdin "${{ steps.aws_account.outputs.account_id }}.dkr.ecr.${BACKEND_REGION}.amazonaws.com"
+        env:
+          BACKEND_REGION: ${{ env.BACKEND_REGION }}
+        id: ecr_login
+
+      - name: Build and push image
+        id: build_push
+        env:
+          ACCOUNT_ID: ${{ steps.aws_account.outputs.account_id }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG_INPUT != '' && env.IMAGE_TAG_INPUT || github.sha }}
+          BACKEND_REGION: ${{ env.BACKEND_REGION }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+        run: |
+          if [ -z "$ECR_REPOSITORY" ]; then
+            echo "ECR repository name is required" >&2
+            exit 1
+          fi
+          IMAGE_URI="${ACCOUNT_ID}.dkr.ecr.${BACKEND_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          docker build -t "$IMAGE_URI" -f app/Dockerfile app
+          docker push "$IMAGE_URI"
+          echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform apply with new image
+        env:
+          TFVARS: ${{ env.TFVARS }}
+          BACKEND_BUCKET: ${{ env.BACKEND_BUCKET }}
+          BACKEND_KEY: ${{ env.BACKEND_KEY }}
+          BACKEND_REGION: ${{ env.BACKEND_REGION }}
+          BACKEND_DDB_TABLE: ${{ env.BACKEND_DDB_TABLE }}
+          TF_VAR_container_image: ${{ steps.build_push.outputs.image_uri }}
+        run: ./scripts/tf-apply.sh
