@@ -11,7 +11,7 @@ $conf['tagline'] = '';
 $conf['sidebar'] = 'sidebar';
 $conf['license'] = 'cc-by-sa';
 $conf['savedir'] = './data';
-$conf['start'] = 'start';
+$conf['start'] = 'home';
 $conf['canonical'] = 0;
 
 // Security

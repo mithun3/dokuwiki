@@ -1,43 +1,23 @@
 ====== Welcome to the Field Recording Library ======
 
-Your one-stop wiki for field recording guides, soundpacks, and audio resources.
+This wiki is pre-seeded and ready to browse. No installer, no setup — just start exploring.
 
-===== Now Playing =====
+==== Catalogs ====
+  * [[recording:guide|recordings]] — gear checklist, setups, and file hygiene.
+  * [[soundpacks:start|soundpacks]] — curated packs ready to drop into your sessions.
+    * [[soundpacks:urban-ambience|Urban Ambience]] — beds, subway hums, city loops.
+    * [[soundpacks:foley-essentials|Foley Essentials]] — cloth, paper, props, doors.
 
-Click the play button in the player bar at the bottom to start listening to our featured recording while you browse!
+==== Highlights ====
+  * Field kit quick-start: mic placement, wind control, and take naming in the guide.
+  * Preview and swap in your own WAVs/MP3s for each pack page.
+  * All visitors can read; admins can update and publish.
 
-===== Browse Our Collection =====
+==== Get Started ====
+  1. Browse the [[recording:guide|guide]] to see the recommended setup.
+  2. Grab a pack from [[soundpacks:start|Sound Packs]] to prototype your mix.
+  3. Replace placeholder media in :recording: and :soundpacks: with your assets.
+  4. [[?do=login|Login]] with your admin account to edit; add demo users by starting with `DEMO_USERS=1`.
 
-Explore field recordings while the music plays in the background:
-
-  * [[recording:guide|Recording Guide]] — gear checklist, setups, and file hygiene
-  * [[soundpacks:start|Sound Packs]] — curated packs ready for your sessions
-    * [[soundpacks:urban-ambience|Urban Ambience]] — city loops, subway hums
-    * [[soundpacks:foley-essentials|Foley Essentials]] — cloth, props, doors
-
-===== Featured Video =====
-
-Watch while you browse — click to play:
-
-{{youtube>dQw4w9WgXcQ?medium}}
-
-//Replace dQw4w9WgXcQ with your actual YouTube video ID//
-
-===== Support This Project =====
-
-Help us keep recording and sharing sounds from around the world:
-
-[[https://www.paypal.com/donate?business=YOUR_PAYPAL_EMAIL&currency_code=AUD|Donate with PayPal]]
-
-//Replace YOUR_PAYPAL_EMAIL with your PayPal business email//
-
-===== Get Started =====
-
-  - Click the play button in the player bar at the bottom to start listening
-  - Browse the [[recording:guide|guide]] while the audio plays
-  - Grab a pack from [[soundpacks:start|Sound Packs]]
-  - [[?do=login|Login]] with your admin account to edit content
-
-----
-
-//The audio player stays fixed at the bottom — browse freely while listening!//
+Need support for donations? Embed your PayPal button on any public page (client-side only).
+Test: [[https://paypal.me/test|PayPal Test]]

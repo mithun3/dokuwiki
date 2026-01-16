@@ -1,0 +1,130 @@
+/* PayPal Donation Button */
+#paypal-donate {
+  margin-top: 1.5em;
+  padding-top: 1em;
+  border-top: 1px solid #ddd;
+}
+
+#paypal-donate .paypal-btn {
+  display: inline-block;
+  background: #0070ba;
+  color: #fff !important;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+#paypal-donate .paypal-btn:hover {
+  background: #003087;
+  text-decoration: none;
+}
+
+/* Wiki Media Player Styles */
+#wiki-media-player {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+#wiki-media-player .player-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+  color: #333;
+}
+
+#wiki-media-player .player-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+#wiki-media-player button {
+  background: #4a90d9;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.85em;
+}
+
+#wiki-media-player button:hover {
+  background: #357abd;
+}
+
+#wiki-media-player .progress-container {
+  flex: 1;
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+#wiki-media-player .progress-bar {
+  height: 100%;
+  background: #4a90d9;
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.1s;
+}
+
+#wiki-media-player .time-display {
+  font-size: 0.75em;
+  color: #666;
+  min-width: 80px;
+  text-align: right;
+}
+
+#wiki-media-player .volume-control {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#wiki-media-player .volume-control input[type="range"] {
+  width: 60px;
+}
+
+#wiki-media-player .queue-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+#wiki-media-player .queue-title {
+  font-size: 0.8em;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+#wiki-media-player .queue-list {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+#wiki-media-player .queue-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 5px;
+  font-size: 0.8em;
+  background: #fff;
+  margin-bottom: 2px;
+  border-radius: 2px;
+}
+
+#wiki-media-player .queue-item.playing {
+  background: #e3f2fd;
+  font-weight: bold;
+}
+
+#wiki-media-player .queue-item button {
+  padding: 2px 6px;
+  font-size: 0.75em;
+}
