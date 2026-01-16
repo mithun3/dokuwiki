@@ -1,0 +1,43 @@
+====== Welcome to the Field Recording Library ======
+
+Your one-stop wiki for field recording guides, soundpacks, and audio resources.
+
+===== Now Playing =====
+
+Click the play button in the player bar at the bottom to start listening to our featured recording while you browse!
+
+===== Browse Our Collection =====
+
+Explore field recordings while the music plays in the background:
+
+  * [[recording:guide|Recording Guide]] — gear checklist, setups, and file hygiene
+  * [[soundpacks:start|Sound Packs]] — curated packs ready for your sessions
+    * [[soundpacks:urban-ambience|Urban Ambience]] — city loops, subway hums
+    * [[soundpacks:foley-essentials|Foley Essentials]] — cloth, props, doors
+
+===== Featured Video =====
+
+Watch while you browse — click to play:
+
+{{youtube>dQw4w9WgXcQ?medium}}
+
+//Replace dQw4w9WgXcQ with your actual YouTube video ID//
+
+===== Support This Project =====
+
+Help us keep recording and sharing sounds from around the world:
+
+[[https://www.paypal.com/donate?business=YOUR_PAYPAL_EMAIL&currency_code=AUD|Donate with PayPal]]
+
+//Replace YOUR_PAYPAL_EMAIL with your PayPal business email//
+
+===== Get Started =====
+
+  - Click the play button in the player bar at the bottom to start listening
+  - Browse the [[recording:guide|guide]] while the audio plays
+  - Grab a pack from [[soundpacks:start|Sound Packs]]
+  - [[?do=login|Login]] with your admin account to edit content
+
+----
+
+//The audio player stays fixed at the bottom — browse freely while listening!//
