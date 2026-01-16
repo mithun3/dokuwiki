@@ -1,0 +1,81 @@
+name: Deploy to ECS
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to deploy"
+        required: true
+        default: "latest"
+      environment:
+        description: "Target environment"
+        type: choice
+        options:
+          - prod
+      aws_region:
+        description: "AWS region"
+        type: choice
+        options:
+          - ap-southeast-2
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-southeast-2
+  ECR_REGISTRY: 462634386575.dkr.ecr.ap-southeast-2.amazonaws.com
+  ECR_REPOSITORY: dokuwiki
+
+jobs:
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set deployment variables
+        id: vars
+        run: |
+          echo "image=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "cluster=dokuwiki-${{ inputs.environment }}-cluster" >> $GITHUB_OUTPUT
+          echo "service=dokuwiki-${{ inputs.environment }}-svc" >> $GITHUB_OUTPUT
+
+      - name: Verify image exists
+        run: |
+          aws ecr describe-images \
+            --repository-name ${{ env.ECR_REPOSITORY }} \
+            --image-ids imageTag=${{ inputs.image_tag }} \
+            --query 'imageDetails[0].imageTags' \
+            --output text
+          echo "✅ Image verified: ${{ steps.vars.outputs.image }}"
+
+      - name: Deploy to ECS
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          CLUSTER: ${{ steps.vars.outputs.cluster }}
+          SERVICE: ${{ steps.vars.outputs.service }}
+          CONTAINER_NAME: dokuwiki
+          IMAGE: ${{ steps.vars.outputs.image }}
+        run: |
+          chmod +x scripts/deploy-ecr-image.sh
+          ./scripts/deploy-ecr-image.sh
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | ${{ inputs.environment }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | \`${{ steps.vars.outputs.image }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cluster | ${{ steps.vars.outputs.cluster }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | ${{ steps.vars.outputs.service }} |" >> $GITHUB_STEP_SUMMARY
