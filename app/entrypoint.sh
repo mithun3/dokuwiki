@@ -80,12 +80,6 @@ for cfg in local.php acl.auth.php users.auth.php; do
   fi
 done
 
-# Copy userscript.js and userstyle.css (force update for JS/CSS changes)
-log "Copying userscript.js and userstyle.css..."
-cp -f "$SEED_DIR/conf/userscript.js" "$CONF_DIR/userscript.js" 2>/dev/null || true
-cp -f "$SEED_DIR/conf/userstyle.css" "$CONF_DIR/userstyle.css" 2>/dev/null || true
-chown www-data:www-data "$CONF_DIR"/*.js "$CONF_DIR"/*.css 2>/dev/null || true
-
 # Force re-seed ALL config files if local.php is missing required keys (indicates broken state)
 log "Checking if config needs full reseed..."
 if ! grep -q "hidewarnings" "$CONF_DIR/local.php" 2>/dev/null; then
