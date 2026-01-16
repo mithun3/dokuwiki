@@ -15,9 +15,9 @@ resource "aws_s3_bucket" "media" {
 resource "aws_s3_bucket_public_access_block" "media" {
   bucket = aws_s3_bucket.media.id
 
-  block_public_acls   = true
-  block_public_policy = true
-  ignore_public_acls  = true
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
@@ -79,9 +79,9 @@ resource "aws_route53_record" "cert_validation" {
 }
 
 resource "aws_acm_certificate_validation" "cf" {
-  provider               = aws.us_east_1
-  count                  = local.manage_cert ? 1 : 0
-  certificate_arn        = aws_acm_certificate.cf[0].arn
+  provider                = aws.us_east_1
+  count                   = local.manage_cert ? 1 : 0
+  certificate_arn         = aws_acm_certificate.cf[0].arn
   validation_record_fqdns = [for r in aws_route53_record.cert_validation : r.fqdn]
 }
 
@@ -132,10 +132,10 @@ resource "aws_s3_bucket_policy" "media" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = { Service = "cloudfront.amazonaws.com" }
-        Action   = ["s3:GetObject"]
-        Resource = "${aws_s3_bucket.media.arn}/*"
+        Action    = ["s3:GetObject"]
+        Resource  = "${aws_s3_bucket.media.arn}/*"
         Condition = {
           StringEquals = { "AWS:SourceArn" = aws_cloudfront_distribution.cdn.arn }
         }

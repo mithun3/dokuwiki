@@ -8,13 +8,13 @@ terraform {
     }
   }
 
-backend "s3" {
-  bucket         = "dokuwiki-tfstate-bucket"
-  key            = "dokuwiki/terraform.tfstate"
-  region         = "ap-southeast-2"
-  dynamodb_table = "tf-locks"
-  encrypt        = true
-}
+  backend "s3" {
+    bucket         = "dokuwiki-tfstate-bucket"
+    key            = "dokuwiki/terraform.tfstate"
+    region         = "ap-southeast-2"
+    dynamodb_table = "tf-locks"
+    encrypt        = true
+  }
 }
 
 provider "aws" {
@@ -58,7 +58,7 @@ locals {
   dns_enabled = var.domain_name != "" && (var.create_hosted_zone || var.hosted_zone_id != "")
   # Use created zone or provided zone ID (only accessed when dns_enabled)
   effective_hosted_zone_id = var.create_hosted_zone && var.domain_name != "" ? aws_route53_zone.main[0].zone_id : var.hosted_zone_id
-  name_prefix = "${var.project_name}-${var.environment}"
+  name_prefix              = "${var.project_name}-${var.environment}"
 }
 
 module "network" {
@@ -71,25 +71,25 @@ module "network" {
 }
 
 module "efs" {
-  source               = "./modules/efs"
-  name                 = local.name_prefix
-  vpc_id               = module.network.vpc_id
-  subnet_ids           = module.network.private_subnet_ids
-  security_group_ids   = []
+  source                  = "./modules/efs"
+  name                    = local.name_prefix
+  vpc_id                  = module.network.vpc_id
+  subnet_ids              = module.network.private_subnet_ids
+  security_group_ids      = []
   ingress_security_groups = []
-  ingress_cidr_blocks  = []
-  backup_policy        = true
+  ingress_cidr_blocks     = []
+  backup_policy           = true
 }
 
 module "alb" {
-  source      = "./modules/alb"
-  name        = local.name_prefix
-  vpc_id      = module.network.vpc_id
-  subnet_ids  = module.network.public_subnet_ids
+  source          = "./modules/alb"
+  name            = local.name_prefix
+  vpc_id          = module.network.vpc_id
+  subnet_ids      = module.network.public_subnet_ids
   enable_https    = local.dns_enabled && length(aws_acm_certificate_validation.main) > 0
-  certificate_arn  = length(aws_acm_certificate_validation.main) > 0 ? aws_acm_certificate_validation.main[0].certificate_arn : ""
-  enable_waf       = false
-  waf_web_acl_arn  = ""
+  certificate_arn = length(aws_acm_certificate_validation.main) > 0 ? aws_acm_certificate_validation.main[0].certificate_arn : ""
+  enable_waf      = false
+  waf_web_acl_arn = ""
 }
 
 module "ecs" {
@@ -117,16 +117,16 @@ module "ecs" {
 module "media_cdn" {
   source = "./modules/media_cdn"
   providers = {
-    aws          = aws
+    aws           = aws
     aws.us_east_1 = aws.us_east_1
   }
 
-  name             = local.name_prefix
-  bucket_name      = var.media_bucket_name
-  domain_name      = var.media_domain_name
-  hosted_zone_id   = local.effective_hosted_zone_id
-  manage_dns       = var.media_domain_name != "" && (var.media_hosted_zone_id != "" || var.create_hosted_zone || var.hosted_zone_id != "")
-  certificate_arn  = var.media_certificate_arn
+  name            = local.name_prefix
+  bucket_name     = var.media_bucket_name
+  domain_name     = var.media_domain_name
+  hosted_zone_id  = local.effective_hosted_zone_id
+  manage_dns      = var.media_domain_name != "" && (var.media_hosted_zone_id != "" || var.create_hosted_zone || var.hosted_zone_id != "")
+  certificate_arn = var.media_certificate_arn
 }
 
 # Allow ECS tasks to reach EFS over NFS without opening to the entire VPC
@@ -140,9 +140,9 @@ resource "aws_security_group_rule" "efs_from_tasks" {
 }
 
 resource "aws_acm_certificate" "main" {
-  count              = var.domain_name == "" ? 0 : 1
-  domain_name        = var.domain_name
-  validation_method  = "DNS"
+  count             = var.domain_name == "" ? 0 : 1
+  domain_name       = var.domain_name
+  validation_method = "DNS"
   lifecycle { create_before_destroy = true }
 }
 

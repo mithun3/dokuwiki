@@ -103,14 +103,14 @@ resource "aws_ecs_task_definition" "this" {
 
   container_definitions = jsonencode([
     {
-      name      = "dokuwiki"
-      image     = var.container_image
-      cpu       = var.cpu
-      memory    = var.memory
-      essential = true
+      name         = "dokuwiki"
+      image        = var.container_image
+      cpu          = var.cpu
+      memory       = var.memory
+      essential    = true
       portMappings = [{ containerPort = 80, hostPort = 80, protocol = "tcp" }]
-      environment = [for k, v in var.env_vars : { name = k, value = v }]
-      secrets     = [for k, v in var.secret_env : { name = k, valueFrom = v }]
+      environment  = [for k, v in var.env_vars : { name = k, value = v }]
+      secrets      = [for k, v in var.secret_env : { name = k, valueFrom = v }]
       mountPoints = [
         { sourceVolume = "efs-data", containerPath = "/var/www/dokuwiki/data", readOnly = false },
         { sourceVolume = "efs-conf", containerPath = "/var/www/dokuwiki/conf", readOnly = false },
@@ -140,8 +140,8 @@ resource "aws_ecs_service" "this" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = var.private_subnet_ids
-    security_groups = [aws_security_group.task.id, var.efs_security_group_id]
+    subnets          = var.private_subnet_ids
+    security_groups  = [aws_security_group.task.id, var.efs_security_group_id]
     assign_public_ip = false
   }
 

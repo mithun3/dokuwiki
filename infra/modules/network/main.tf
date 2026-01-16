@@ -10,7 +10,7 @@ resource "aws_vpc" "this" {
 
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
-  tags = { Name = "${var.name}-igw" }
+  tags   = { Name = "${var.name}-igw" }
 }
 
 resource "aws_subnet" "public" {
@@ -41,22 +41,22 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_eip" "nat" {
-  count = var.enable_nat ? 1 : 0
+  count  = var.enable_nat ? 1 : 0
   domain = "vpc"
-  tags = { Name = "${var.name}-nat-eip" }
+  tags   = { Name = "${var.name}-nat-eip" }
 }
 
 resource "aws_nat_gateway" "this" {
   count         = var.enable_nat ? 1 : 0
   allocation_id = aws_eip.nat[0].id
   subnet_id     = aws_subnet.public[0].id
-  tags = { Name = "${var.name}-nat" }
-  depends_on = [aws_internet_gateway.this]
+  tags          = { Name = "${var.name}-nat" }
+  depends_on    = [aws_internet_gateway.this]
 }
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
-  tags = { Name = "${var.name}-public-rt" }
+  tags   = { Name = "${var.name}-public-rt" }
 }
 
 resource "aws_route" "public_internet" {
@@ -74,7 +74,7 @@ resource "aws_route_table_association" "public" {
 resource "aws_route_table" "private" {
   count  = var.enable_nat ? 1 : 0
   vpc_id = aws_vpc.this.id
-  tags = { Name = "${var.name}-private-rt" }
+  tags   = { Name = "${var.name}-private-rt" }
 }
 
 resource "aws_route" "private_nat" {

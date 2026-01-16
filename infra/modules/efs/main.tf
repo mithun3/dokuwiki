@@ -6,12 +6,12 @@ resource "aws_security_group" "efs" {
   dynamic "ingress" {
     for_each = length(var.ingress_security_groups) > 0 || length(var.ingress_cidr_blocks) > 0 ? [1] : []
     content {
-      from_port         = 2049
-      to_port           = 2049
-      protocol          = "tcp"
-      security_groups   = var.ingress_security_groups
-      cidr_blocks       = var.ingress_cidr_blocks
-      ipv6_cidr_blocks  = []
+      from_port        = 2049
+      to_port          = 2049
+      protocol         = "tcp"
+      security_groups  = var.ingress_security_groups
+      cidr_blocks      = var.ingress_cidr_blocks
+      ipv6_cidr_blocks = []
     }
   }
 
@@ -55,7 +55,7 @@ resource "aws_efs_access_point" "data" {
   file_system_id = aws_efs_file_system.this.id
 
   posix_user {
-    uid = 82  # www-data in Alpine
+    uid = 82 # www-data in Alpine
     gid = 82
   }
 
