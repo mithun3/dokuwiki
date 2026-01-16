@@ -1,5 +1,5 @@
 - [Home](home.md)
 - [Recording](recording/recording.md)
-  - [Urban Ambience](sounds/urban-ambience.md)
-  - [Foley Essentials](sounds/foley-essentials.md)
+  - [Urban Ambience](recording/urban-ambience.md)
+  - [Foley Essentials](recording/foley-essentials.md)
 - [Sounds](sounds/sounds.md)

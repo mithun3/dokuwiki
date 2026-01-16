@@ -95,7 +95,7 @@ jobs:
             exit 1
           fi
           IMAGE_URI="${ACCOUNT_ID}.dkr.ecr.${BACKEND_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
-          docker buildx build --platform linux/amd64 -t "$IMAGE_URI" -f app/Dockerfile app --push
+          docker buildx build --no-cache --platform linux/amd64 -t "$IMAGE_URI" -f app/Dockerfile app --push
           echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
 
       # - name: Set up Terraform
