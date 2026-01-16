@@ -392,7 +392,13 @@ Set values in `infra/terraform.tfvars` (or another tfvars file):
 
 ## 5) Build and push the app image
 ```sh
-ACCOUNT_ID=$(AWS_PROFILE=my-creds aws sts get-caller-identity --query Account --output text) && REGION=ap-southeast-2 && ECR_REPO=dokuwiki && IMAGE_TAG=latest && IMAGE_URI=${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} && AWS_PROFILE=my-creds aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com && docker build -t "$IMAGE_URI" -f app/Dockerfile app && docker push "$IMAGE_URI"
+ACCOUNT_ID=$(AWS_PROFILE=my-creds aws sts get-caller-identity --query Account --output text) && \
+REGION=ap-southeast-2 && \
+ECR_REPO=dokuwiki && \
+IMAGE_TAG=latest && \
+IMAGE_URI=${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG} && \
+AWS_PROFILE=my-creds aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com && \
+docker buildx build --platform linux/amd64 -t "$IMAGE_URI" -f app/Dockerfile app --push
 ```
 Update `container_image` (or export `TF_VAR_container_image=$IMAGE_URI`) for Terraform.
 

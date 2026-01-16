@@ -2,3 +2,28 @@
 *.tfstate.backup
 .terraform/
 tfplan.out
+
+# DokuWiki runtime/cache files (regenerated at startup)
+app/seed/data/cache/
+app/seed/data/index/
+app/seed/data/log/
+app/seed/data/meta/
+app/seed/conf/plugins.local.php
+
+# Built-in DokuWiki plugins (come from Docker image)
+app/seed/lib/plugins/acl/
+app/seed/lib/plugins/authad/
+app/seed/lib/plugins/authldap/
+app/seed/lib/plugins/authpdo/
+app/seed/lib/plugins/authplain/
+app/seed/lib/plugins/config/
+app/seed/lib/plugins/extension/
+app/seed/lib/plugins/info/
+app/seed/lib/plugins/logviewer/
+app/seed/lib/plugins/popularity/
+app/seed/lib/plugins/revert/
+app/seed/lib/plugins/safefnrecode/
+app/seed/lib/plugins/styling/
+app/seed/lib/plugins/usermanager/
+app/seed/lib/plugins/*.php
+app/seed/lib/plugins/index.html
