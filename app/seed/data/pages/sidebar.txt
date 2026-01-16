@@ -1,5 +1,0 @@
-  * [[home|Home]]
-  * [[recording:guide|recording]]
-  * [[soundpacks:soundpacks|Sound Packs]]
-    * [[soundpacks:urban-ambience|Urban Ambience]]
-    * [[soundpacks:foley-essentials|Foley Essentials]]

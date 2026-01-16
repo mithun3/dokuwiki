@@ -124,11 +124,18 @@ ls -la "$DATA_DIR" || true
 log "Contents of $DATA_DIR/pages:"
 ls -la "$DATA_DIR/pages" 2>/dev/null || log "pages dir missing or empty"
 
-# Force-insert soundpacks pages if missing
-if [ ! -d "$DATA_DIR/pages/soundpacks" ]; then
-  log "Copying soundpacks pages..."
+# Force-insert sounds pages if missing
+if [ ! -d "$DATA_DIR/pages/sounds" ]; then
+  log "Copying sounds pages..."
   mkdir -p "$DATA_DIR/pages"
-  cp -a "$SEED_DIR/data/pages/soundpacks" "$DATA_DIR/pages/"
+  cp -a "$SEED_DIR/data/pages/sounds" "$DATA_DIR/pages/"
+fi
+
+# Force-insert recording pages if missing
+if [ ! -d "$DATA_DIR/pages/recording" ]; then
+  log "Copying recording pages..."
+  mkdir -p "$DATA_DIR/pages"
+  cp -a "$SEED_DIR/data/pages/recording" "$DATA_DIR/pages/"
 fi
 
 # Force-insert sidebar if missing

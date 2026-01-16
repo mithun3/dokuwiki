@@ -1,6 +1,8 @@
 services:
   dokuwiki:
-    build: ./app
+    build:
+      context: .
+      dockerfile: app/Dockerfile
     ports:
       - "8080:80"
     environment:
@@ -12,13 +14,11 @@ services:
       - S3_BACKUP_ON_START=${S3_BACKUP_ON_START:-0}
       - S3_BACKUP_CRON=${S3_BACKUP_CRON:-}
     volumes:
-      # Bind mounts keep git as the single source of truth for pages, media, config, and plugins.
-      - ./app/seed/data:/var/www/dokuwiki/data
-      - ./app/seed/conf:/var/www/dokuwiki/conf
-      - ./app/seed/lib/plugins:/var/www/dokuwiki/lib/plugins
-      # Optional: mount markdown-first authoring if you convert/rsync into data.
-      # - ./content/pages:/var/www/dokuwiki/data/pages:ro
-      # - ./content/media:/var/www/dokuwiki/data/media:ro
+      # For local dev: bind mount converted pages from content/
+      # In production (ECS), these are EFS volumes seeded by entrypoint
+      - dokuwiki_data:/var/www/dokuwiki/data
+      - dokuwiki_conf:/var/www/dokuwiki/conf
+      - dokuwiki_plugins:/var/www/dokuwiki/lib/plugins
     restart: unless-stopped
 
 volumes:

@@ -45,17 +45,27 @@ RUN set -eux; \
   cp -a "${DOKUWIKI_PATH}/lib/plugins" /opt/plugins-builtin
 
 # Seed config/content that will be copied to writable volumes on first run
-COPY seed/ /opt/dokuseed/
+COPY app/seed/ /opt/dokuseed/
+
+# Copy markdown content and conversion script
+COPY app/md2doku.sh /opt/md2doku.sh
+COPY content/pages/ /opt/content-md/
+
+# Convert markdown to DokuWiki and copy to seed
+RUN chmod +x /opt/md2doku.sh && \
+    mkdir -p /opt/dokuseed/data/pages && \
+    /opt/md2doku.sh /opt/content-md /opt/dokuseed/data/pages && \
+    rm -rf /opt/content-md
 
 # Entrypoint handles first-run seeding (conf/users/acl/pages) and then starts supervisord
-COPY entrypoint.sh /entrypoint.sh
+COPY app/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Config files
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY supervisord.conf /etc/supervisord.conf
-COPY php.ini /usr/local/etc/php/conf.d/dokuwiki.ini
-COPY backup.sh /backup.sh
+COPY app/nginx.conf /etc/nginx/nginx.conf
+COPY app/supervisord.conf /etc/supervisord.conf
+COPY app/php.ini /usr/local/etc/php/conf.d/dokuwiki.ini
+COPY app/backup.sh /backup.sh
 
 VOLUME ["/var/www/dokuwiki/data", "/var/www/dokuwiki/conf", "/var/www/dokuwiki/lib/plugins"]
 
