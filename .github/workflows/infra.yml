@@ -9,20 +9,38 @@ on:
     inputs:
       tfvars_path:
         description: "Path to the tfvars file"
+        required: true
         default: "infra/terraform.tfvars"
       backend_bucket:
-        description: "S3 bucket for remote state"
-        default: ""
+        description: "S3 bucket name for Terraform remote state"
+        type: choice
+        options:
+          - "dokuwiki-tfstate-bucket"
       backend_key:
         description: "Object key for state file"
-        default: "dokuwiki/terraform.tfstate"
+        type: choice
+        options:
+          - "dokuwiki/terraform.tfstate"
       backend_region:
         description: "AWS region for the backend"
-        default: "us-east-1"
+        type: choice
+        options:
+          - "ap-southeast-2"
       backend_dynamodb_table:
         description: "DynamoDB table for state locking"
-        default: "tf-locks"
-
+        type: choice
+        options:
+          - "tf-locks"
+      ecr_repository:
+        description: "ECR repository name (without account/registry)"
+        type: choice
+        options:
+          - "dokuwiki-app-repo"
+      image_tag:
+        description: "Optional image tag (defaults to commit SHA)"
+        required: true
+        default: "latest"
+  
 permissions:
   id-token: write
   contents: read

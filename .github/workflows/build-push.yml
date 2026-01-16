@@ -11,25 +11,37 @@ on:
     inputs:
       ecr_repository:
         description: "ECR repository name (without account/registry)"
-        default: "dokuwiki"
+        type: choice
+        options:
+          - "dokuwiki-app-repo"
       image_tag:
         description: "Optional image tag (defaults to commit SHA)"
-        default: ""
+        required: true
+        default: "latest"
       tfvars_path:
         description: "Path to the tfvars file"
+        required: true
         default: "infra/terraform.tfvars"
       backend_bucket:
-        description: "S3 bucket for remote state"
-        default: ""
+        description: "S3 bucket name for Terraform remote state"
+        type: choice
+        options:
+          - "dokuwiki-tfstate-bucket"
       backend_key:
         description: "Object key for state file"
-        default: "dokuwiki/terraform.tfstate"
+        type: choice
+        options:
+          - "dokuwiki/terraform.tfstate"
       backend_region:
         description: "AWS region for the backend"
-        default: "us-east-1"
+        type: choice
+        options:
+          - "ap-southeast-2"
       backend_dynamodb_table:
         description: "DynamoDB table for state locking"
-        default: "tf-locks"
+        type: choice
+        options:
+          - "tf-locks"
 
 permissions:
   id-token: write
@@ -37,7 +49,7 @@ permissions:
 
 concurrency:
   group: app-deploy-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   TF_IN_AUTOMATION: "true"
@@ -49,7 +61,7 @@ jobs:
       TFVARS: ${{ inputs.tfvars_path != '' && inputs.tfvars_path || 'infra/terraform.tfvars' }}
       BACKEND_BUCKET: ${{ inputs.backend_bucket != '' && inputs.backend_bucket || secrets.TF_BACKEND_BUCKET }}
       BACKEND_KEY: ${{ inputs.backend_key != '' && inputs.backend_key || secrets.TF_BACKEND_KEY || 'dokuwiki/terraform.tfstate' }}
-      BACKEND_REGION: ${{ inputs.backend_region != '' && inputs.backend_region || secrets.TF_BACKEND_REGION || 'us-east-1' }}
+      BACKEND_REGION: ${{ inputs.backend_region != '' && inputs.backend_region || secrets.TF_BACKEND_REGION || 'ap-southeast-2' }}
       BACKEND_DDB_TABLE: ${{ inputs.backend_dynamodb_table != '' && inputs.backend_dynamodb_table || secrets.TF_BACKEND_DDB_TABLE }}
       ECR_REPOSITORY: ${{ inputs.ecr_repository != '' && inputs.ecr_repository || secrets.ECR_REPOSITORY }}
       IMAGE_TAG_INPUT: ${{ inputs.image_tag }}
