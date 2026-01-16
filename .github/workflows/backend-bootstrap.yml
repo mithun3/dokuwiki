@@ -5,20 +5,29 @@ on:
     inputs:
       state_bucket:
         description: "S3 bucket name for Terraform state"
-        required: true
-        default: "dokuwiki-tfstate-bucket"
+        type: choice
+        options:
+          - "dokuwiki-tfstate-bucket"
       state_key:
         description: "Object key for the state file"
-        default: "dokuwiki/terraform.tfstate"
+        type: choice
+        options:
+          - "dokuwiki/terraform.tfstate"
       lock_table:
         description: "DynamoDB table name for state locking"
-        default: "tf-locks"
+        type: choice
+        options:
+          - "tf-locks"
       aws_region:
-        description: "AWS region"
-        default: "ap-southeast-2"
+        description: "AWS region (fixed)"
+        type: choice
+        options:
+          - "ap-southeast-2"
       project_name:
         description: "Project tag for backend stack"
-        default: "dokuwiki"
+        type: choice
+        options:
+          - "dokuwiki"
 
 permissions:
   id-token: write
