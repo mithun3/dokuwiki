@@ -1,6 +1,6 @@
 # Adding New Content Pages
 
-This guide explains how to add new pages to the DokuWiki.
+This guide explains how to add new pages to the DokuWiki using a proper Git workflow.
 
 ## Content Structure
 
@@ -25,18 +25,44 @@ content/
 
 ## Workflow: Adding a New Page
 
-### Step 1: Create the Markdown File
+### Step 1: Create a GitHub Issue
+
+Before starting work, create an issue to track the content addition.
+
+1. Go to your repository on GitHub
+2. Click **Issues** → **New issue**
+3. Fill in:
+   - **Title:** `Add page: <page-name>` (e.g., "Add page: microphone-guide")
+   - **Description:** Brief description of the content to be added
+   - **Labels:** `content`, `documentation` (create if needed)
+4. Click **Submit new issue**
+5. Note the issue number (e.g., `#42`)
+
+### Step 2: Create a Feature Branch
+
+```bash
+# Fetch latest changes
+git fetch origin
+git checkout main
+git pull origin main
+
+# Create a branch named after the issue
+# Format: content/<issue-number>-<short-description>
+git checkout -b content/42-microphone-guide
+```
+
+### Step 3: Create the Markdown File
 
 ```bash
 # Single page at root level
-touch content/pages/my-new-page.md
+touch content/pages/microphone-guide.md
 
-# Page in a namespace (folder)
+# Or page in a namespace (folder)
 mkdir -p content/pages/guides
-touch content/pages/guides/getting-started.md
+touch content/pages/guides/microphone-guide.md
 ```
 
-### Step 2: Write Your Content
+### Step 4: Write Your Content
 
 Use standard Markdown syntax. The build process converts it to DokuWiki format.
 
@@ -63,38 +89,89 @@ Introduction paragraph.
 ![Image alt text](recording/image.png)
 ```
 
-### Step 3: Update the Sidebar (Optional)
+### Step 5: Update the Sidebar (Optional)
 
 If you want the page in navigation, edit `content/pages/sidebar.md`:
 
 ```markdown
 - [Home](home.md)
-- [New Page](my-new-page.md)
-- [Guides](guides/getting-started.md)
+- [Microphone Guide](guides/microphone-guide.md)
 ```
 
-### Step 4: Commit and Push
+### Step 6: Commit and Push to Your Branch
 
 ```bash
+# Stage your changes
 git add content/pages/
-git commit -m "content: add new page - my-new-page"
-git push
+
+# Commit with a message that references the issue
+git commit -m "content: add microphone guide
+
+Closes #42"
+
+# Push your branch to GitHub
+git push -u origin content/42-microphone-guide
 ```
 
-### Step 5: Deploy
+### Step 7: Create a Pull Request
 
-The GitHub Actions workflow automatically:
+1. Go to your repository on GitHub
+2. You'll see a banner: "content/42-microphone-guide had recent pushes" → Click **Compare & pull request**
+   - Or go to **Pull requests** → **New pull request**
+3. Fill in:
+   - **Base:** `main` ← **Compare:** `content/42-microphone-guide`
+   - **Title:** `Add microphone guide page`
+   - **Description:**
+     ```
+     ## Summary
+     Adds a new guide for microphone selection and placement.
+     
+     ## Changes
+     - Added `content/pages/guides/microphone-guide.md`
+     - Updated sidebar navigation
+     
+     Closes #42
+     ```
+4. Click **Create pull request**
+
+### Step 8: Review and Merge
+
+**If you're the reviewer:**
+1. Go to the PR → **Files changed** tab
+2. Review the content changes
+3. Add comments if needed or click **Approve**
+
+**To merge:**
+1. Ensure all checks pass (if CI is configured)
+2. Click **Merge pull request** → **Confirm merge**
+3. Optionally click **Delete branch** to clean up
+
+### Step 9: Deploy
+
+After merging to `main`, GitHub Actions automatically:
 1. Rebuilds the Docker image (converts Markdown → DokuWiki syntax)
 2. Pushes to ECR
 3. Deploys to ECS
 
-Or trigger manually:
-```bash
-# Via GitHub Actions
-# Go to Actions → Build & Push Image → Run workflow
+**Monitor the deployment:**
+- Go to **Actions** tab to watch the workflow
+- Check https://sysya.com.au to verify the new page is live
 
-# Or deploy locally
-AWS_PROFILE=my-creds ./scripts/deploy-ecr-image.sh
+---
+
+## Quick Command Reference
+
+```bash
+# Full workflow from start to finish
+git fetch origin && git checkout main && git pull origin main
+git checkout -b content/42-microphone-guide
+# ... create and edit files ...
+git add content/pages/
+git commit -m "content: add microphone guide
+
+Closes #42"
+git push -u origin content/42-microphone-guide
+# ... create PR on GitHub, review, merge ...
 ```
 
 ---
