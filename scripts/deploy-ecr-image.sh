@@ -3,7 +3,7 @@ set -euo pipefail
 
 log() { echo "[deploy] $(date '+%H:%M:%S') $*"; }
 
-: "${AWS_PROFILE:=my-creds}"
+# AWS_PROFILE is optional - in CI, credentials come from env vars
 : "${AWS_REGION:=ap-southeast-2}"
 : "${CLUSTER:=dokuwiki-prod-cluster}"
 : "${SERVICE:=dokuwiki-prod-svc}"
@@ -34,7 +34,8 @@ require() {
 require aws
 require jq
 
-export AWS_PROFILE AWS_REGION AWS_PAGER
+export AWS_REGION AWS_PAGER
+[ -n "${AWS_PROFILE:-}" ] && export AWS_PROFILE
 
 log "Fetching current task definition..."
 current_td_arn="$(aws ecs describe-services \
