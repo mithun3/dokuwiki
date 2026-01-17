@@ -1,5 +1,11 @@
 name: Terraform Backend Bootstrap
 
+# One-time setup workflow for Terraform remote state backend:
+#   - bootstrap: Creates S3 bucket and DynamoDB table for state storage/locking
+#
+# Run this once before any other Terraform workflows.
+# Manual trigger only (workflow_dispatch).
+
 on:
   workflow_dispatch:
     inputs:

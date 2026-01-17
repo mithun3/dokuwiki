@@ -1,4 +1,11 @@
-name: Terraform
+name: Terraform CI
+
+# Runs on infrastructure changes to validate Terraform code quality:
+#   - Format check (terraform fmt)
+#   - Validation (terraform validate)
+#   - Linting (TFLint)
+#   - Security scanning (Trivy)
+#   - Documentation check (terraform-docs)
 
 on:
   push:

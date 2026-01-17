@@ -1,5 +1,11 @@
 name: App Deploy
 
+# Full application deployment pipeline:
+#   - build-and-apply: Builds Docker image, pushes to ECR, and applies Terraform
+#
+# Triggered on main branch pushes to app/, infra/, or scripts/,
+# or manually via workflow_dispatch.
+
 on:
   push:
     branches: ["main"]

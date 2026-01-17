@@ -1,5 +1,11 @@
 name: Deploy to ECS
 
+# ECS deployment workflow (manual trigger only):
+#   - deploy: Verifies image exists in ECR and updates ECS service
+#
+# Use this for deploying a specific image tag to an environment
+# without rebuilding or re-applying infrastructure.
+
 on:
   workflow_dispatch:
     inputs:

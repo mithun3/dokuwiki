@@ -1,5 +1,11 @@
 name: Terraform Infra
 
+# Infrastructure management workflow:
+#   - plan: Runs terraform plan on PRs and posts results as PR comment
+#   - apply: Applies infrastructure changes (manual trigger only)
+#
+# Triggered on PR changes to infra/ or scripts/, or manually via workflow_dispatch.
+
 on:
   pull_request:
     paths:
