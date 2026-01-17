@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script is a workaround for the "BucketNotEmpty" error when destroying a
-# versioned S3 bucket. It first applies the configuration to ensure that the
-# 'force_destroy = true' attribute is set in the Terraform state, and then
-# immediately destroys the infrastructure.
+# End-to-end idempotency test script
+#
+# This script verifies that the Terraform configuration is idempotent by:
+#   1. Applying the full infrastructure (terraform apply)
+#   2. Immediately destroying it (terraform destroy)
+#
+# If both operations complete successfully, the infrastructure is proven to be
+# reproducible and cleanly removable - essential for reliable IaC.
+#
+# Note: This also works around the "BucketNotEmpty" error when destroying
+# versioned S3 buckets by ensuring 'force_destroy = true' is in state first.
 #
 # Usage:
 #   AWS_PROFILE=my-creds TFVARS=terraform.tfvars ./scripts/tf-force-destroy.sh
