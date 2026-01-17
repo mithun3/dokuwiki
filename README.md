@@ -148,6 +148,76 @@ Once DNS propagates, AWS ACM will automatically validate your certificate. The T
 
 ---
 
+## Development & Deployment
+
+### Local Development (localhost)
+
+Run DokuWiki locally for development and testing:
+
+```bash
+# Start with docker-compose
+docker-compose up --build
+
+# Visit http://localhost:8080
+
+# With admin password and demo users
+ADMIN_PASSWORD=changeme DEMO_USERS=1 docker-compose up --build
+
+# Stop and remove containers
+docker-compose down
+
+# Stop and remove containers + volumes (clean slate)
+docker-compose down -v
+```
+
+### Local Build & Deploy to AWS
+
+Build the Docker image locally and deploy to your AWS ECS cluster:
+
+```bash
+# 1. Login to ECR
+AWS_PROFILE=my-creds aws ecr get-login-password --region ap-southeast-2 | \
+  docker login --username AWS --password-stdin 462634386575.dkr.ecr.ap-southeast-2.amazonaws.com
+
+# 2. Build image (linux/amd64 for ECS Fargate)
+docker build --platform linux/amd64 \
+  -t 462634386575.dkr.ecr.ap-southeast-2.amazonaws.com/dokuwiki-app-repo:latest \
+  -f app/Dockerfile .
+
+# 3. Push to ECR
+docker push 462634386575.dkr.ecr.ap-southeast-2.amazonaws.com/dokuwiki-app-repo:latest
+
+# 4. Deploy (force new ECS task)
+AWS_PROFILE=my-creds aws ecs update-service \
+  --cluster dokuwiki-prod-cluster \
+  --service dokuwiki-prod-svc \
+  --force-new-deployment \
+  --region ap-southeast-2
+
+# 5. Monitor deployment
+AWS_PROFILE=my-creds aws ecs describe-services \
+  --cluster dokuwiki-prod-cluster \
+  --services dokuwiki-prod-svc \
+  --region ap-southeast-2 \
+  --query 'services[0].deployments[*].{Status:status,Running:runningCount,Pending:pendingCount}'
+```
+
+**Or use the deploy script:**
+```bash
+AWS_PROFILE=my-creds IMAGE=462634386575.dkr.ecr.ap-southeast-2.amazonaws.com/dokuwiki-app-repo:latest \
+  ./scripts/deploy-ecr-image.sh
+```
+
+### CI/CD via GitHub Actions
+
+Push to `main` branch triggers automatic build and deploy:
+- Changes to `app/**`, `infra/**`, or `scripts/**` trigger the Build & Push workflow
+- The workflow builds, pushes to ECR, and deploys to ECS
+
+Manual trigger: Go to **Actions** → **Build & Push Image** → **Run workflow**
+
+---
+
 Next steps:
 1) Initialize Terraform backend (S3 + DynamoDB), then create modules and per-env stacks under `infra/`.
 2) Build/push the app image to ECR; wire ECS/ALB/EFS in Terraform.
