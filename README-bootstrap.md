@@ -16,7 +16,7 @@ Choose one method; ensure `aws sts get-caller-identity --region ap-southeast-2` 
 
 - Access keys (no SSO):
 ```sh
-  unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_PROFILE AWS_REGION
+unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_PROFILE AWS_REGION
 ```
 - Configure Access keys:
 ```sh
@@ -29,7 +29,7 @@ aws configure --profile my-creds
 ```
 - Verify access:
 ```sh
-  unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_PROFILE AWS_REGION
+unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_PROFILE AWS_REGION
 AWS_PROFILE=my-creds aws sts get-caller-identity --region ap-southeast-2
 ```
 - SSO (if your org provides a start URL/role):
@@ -424,8 +424,39 @@ ADMIN_PASSWORD=changeme DEMO_USERS=1 docker compose up
 Browse http://localhost:8080. Stop with `docker compose down`.
 
 ## 9) Destroy (if needed)
+
 ```sh
 cd infra
-TFVARS=terraform.tfvars ../scripts/tf-destroy.sh
+AWS_PROFILE=my-creds TFVARS=terraform.tfvars ../scripts/tf-destroy.sh
 ```
+
+## Troubleshooting
+
+### S3 Bucket Deletion Fails (BucketNotEmpty)
+
+If `terraform destroy` fails with an error like `BucketNotEmpty: The bucket you tried to delete is not empty`, it's often because the S3 bucket has versioning enabled and contains old object versions or delete markers. Terraform's `force_destroy` attribute may not be able to handle this scenario.
+
+To fix this, you must manually empty the bucket using the AWS CLI before running the destroy command again.
+
+**Step 1: Generate a list of all object versions**
+
+This command lists all object versions and delete markers in the bucket and saves them to a local file named `objects-to-delete.json`.
+
+```sh
+AWS_PROFILE=my-creds aws s3api list-object-versions --bucket <YOUR_BUCKET_NAME> --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}' --output json > objects-to-delete.json
+```
+*(Replace `<YOUR_BUCKET_NAME>` with the actual name of your bucket, e.g., `dokuwiki-media-example`)*
+
+**Step 2: Delete the objects from the list**
+
+This command reads the `objects-to-delete.json` file and deletes all the specified object versions from the bucket.
+
+```sh
+if [ -s objects-to-delete.json ]; then AWS_PROFILE=my-creds aws s3api delete-objects --bucket <YOUR_BUCKET_NAME> --delete file://objects-to-delete.json; else echo "No objects to delete."; fi
+```
+
+After the bucket is empty, you can run the `tf-destroy.sh` script again, and it should succeed.
+
+---
+
 Only destroy the backend after migrating or discarding all state.

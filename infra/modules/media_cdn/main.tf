@@ -7,7 +7,7 @@ locals {
 
 resource "aws_s3_bucket" "media" {
   bucket        = var.bucket_name
-  force_destroy = false
+  force_destroy = true
 
   tags = { Name = "${var.name}-media" }
 }

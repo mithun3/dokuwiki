@@ -31,4 +31,4 @@ else
   terraform init
 fi
 
-terraform destroy -var-file="$TFVARS"
+terraform destroy -refresh=true -auto-approve -var-file="$TFVARS"

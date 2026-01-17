@@ -7,6 +7,147 @@ This repository seeds infrastructure, application image, and content-as-code for
 - `content/`: Markdown-first authoring folder; mount into the container or convert via CI before deploy.
 - `docker-compose.yml`: local runner exposing http://localhost:8080; volumes keep data/config/plugins persistent on your machine. Use `ADMIN_PASSWORD=changeme DEMO_USERS=1` for seeded users; set `S3_BACKUP_BUCKET` (+ optional `S3_BACKUP_PREFIX`, `S3_BACKUP_ON_START=1`) to snapshot state to S3 at startup; set `S3_BACKUP_CRON` for recurring uploads. Nginx is configured for DokuWiki pretty URLs.
 
+---
+
+## 🚨 CRITICAL: Domain Nameserver Configuration
+
+When deploying to AWS with a custom domain, you **MUST** configure your domain's nameservers at your registrar. Without this step, SSL certificate validation will hang indefinitely.
+
+### Why This Is Required
+
+Terraform creates a Route53 hosted zone with unique AWS nameservers. For DNS to work, your domain registrar must delegate DNS authority to these nameservers. Each time the hosted zone is recreated (e.g., after `terraform destroy`), **new nameservers are assigned** and must be updated at your registrar.
+
+### Step-by-Step Instructions
+
+#### 1. Get the Nameservers from Terraform Output
+
+After running `terraform apply`, look for the `hosted_zone_nameservers` output:
+
+```
+Outputs:
+
+hosted_zone_nameservers = tolist([
+  "ns-1833.awsdns-37.co.uk",
+  "ns-383.awsdns-47.com",
+  "ns-570.awsdns-07.net",
+  "ns-1433.awsdns-51.org",
+])
+```
+
+Or retrieve them with AWS CLI:
+```bash
+AWS_PROFILE=my-creds aws route53 get-hosted-zone \
+  --id $(terraform output -raw hosted_zone_id) \
+  --query 'DelegationSet.NameServers' --output table
+```
+
+#### 2. Update Your Domain Registrar
+
+Log into your domain registrar and update the nameserver records:
+
+| Registrar | Navigation Path |
+|-----------|-----------------|
+| **Namecheap** | Domain List → Manage → Nameservers → Custom DNS |
+| **GoDaddy** | My Products → DNS → Nameservers → Change → Enter my own |
+| **Cloudflare** | Select Domain → DNS → Change nameservers |
+| **Google Domains** | My domains → DNS → Name servers → Use custom |
+| **AWS Route53 Registrar** | Registered domains → Select domain → Add/edit name servers |
+
+**Enter all 4 nameservers** exactly as shown in the Terraform output.
+
+#### 3. Wait for DNS Propagation
+
+DNS changes can take **5 minutes to 48 hours** to propagate globally (typically 5-15 minutes).
+
+### DNS Verification Commands
+
+**Check nameservers using `dig`:**
+```bash
+# Basic NS lookup
+dig NS sysya.com.au +short
+
+# More detailed output
+dig NS sysya.com.au
+
+# Query specific DNS servers to check propagation:
+dig NS sysya.com.au @8.8.8.8 +short      # Google DNS
+dig NS sysya.com.au @1.1.1.1 +short      # Cloudflare DNS
+dig NS sysya.com.au @208.67.222.222 +short  # OpenDNS
+```
+
+**Check nameservers using `nslookup`:**
+```bash
+nslookup -type=NS sysya.com.au
+nslookup -type=NS sysya.com.au 8.8.8.8   # Query Google DNS
+```
+
+**Check nameservers using `host`:**
+```bash
+host -t NS sysya.com.au
+```
+
+**Verify ACM validation CNAME record resolves:**
+```bash
+# Get the validation record name from AWS
+AWS_PROFILE=my-creds aws acm describe-certificate \
+  --certificate-arn $(terraform output -raw app_cert_arn 2>/dev/null || echo "CERT_ARN") \
+  --query 'Certificate.DomainValidationOptions[0].ResourceRecord.Name' --output text
+
+# Then verify it resolves
+dig CNAME _validation-record-name.sysya.com.au +short
+```
+
+**Monitor propagation (macOS - no `watch` by default):**
+```bash
+# Loop to check every 30 seconds
+while true; do clear; date; echo "--- NS Records ---"; dig NS sysya.com.au @8.8.8.8 +short; sleep 30; done
+
+# Or install watch: brew install watch
+watch -n 30 'dig NS sysya.com.au @8.8.8.8 +short'
+```
+
+**Compare current vs expected nameservers:**
+```bash
+echo "=== Current (from Google DNS) ===" && \
+dig NS sysya.com.au @8.8.8.8 +short && \
+echo "" && echo "=== Expected (from AWS) ===" && \
+AWS_PROFILE=my-creds aws route53 get-hosted-zone \
+  --id $(terraform output -raw hosted_zone_id) \
+  --query 'DelegationSet.NameServers[]' --output text | tr '\t' '\n'
+```
+
+**Online DNS propagation checkers:**
+- https://dnschecker.org - Check propagation globally
+- https://mxtoolbox.com/DNSLookup.aspx
+- https://www.whatsmydns.net
+
+**Expected output when propagation is complete:**
+```
+ns-1833.awsdns-37.co.uk.
+ns-383.awsdns-47.com.
+ns-570.awsdns-07.net.
+ns-1433.awsdns-51.org.
+```
+
+#### 4. ACM Certificate Validation Completes
+
+Once DNS propagates, AWS ACM will automatically validate your certificate. The Terraform apply will continue and complete.
+
+### Troubleshooting
+
+| Symptom | Cause | Solution |
+|---------|-------|----------|
+| `aws_acm_certificate_validation.main[0]: Still creating...` loops forever | Nameservers not configured at registrar | Update NS records at registrar |
+| Certificate validated before but now hanging | Hosted zone was recreated with new NS | Update NS records with new values |
+| `dig NS domain.com` returns old nameservers | DNS not propagated yet | Wait 5-15 minutes and retry |
+| `dig NS domain.com` returns nothing | Domain not pointing to any nameservers | Verify registrar settings |
+
+### Re-running After `terraform destroy`
+
+⚠️ **Important**: Every `terraform destroy` and `terraform apply` cycle creates a **new hosted zone with new nameservers**. You must update your registrar each time.
+
+---
+
 Next steps:
 1) Initialize Terraform backend (S3 + DynamoDB), then create modules and per-env stacks under `infra/`.
 2) Build/push the app image to ECR; wire ECS/ALB/EFS in Terraform.

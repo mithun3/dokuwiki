@@ -83,6 +83,9 @@ module "efs" {
 
 module "alb" {
   source          = "./modules/alb"
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
   name            = local.name_prefix
   vpc_id          = module.network.vpc_id
   subnet_ids      = module.network.public_subnet_ids
@@ -139,7 +142,10 @@ resource "aws_security_group_rule" "efs_from_tasks" {
   source_security_group_id = module.ecs.task_security_group_id
 }
 
+# ALB certificate - must be in the SAME region as the ALB (ap-southeast-2)
+# Note: CloudFront certificates are created separately in us-east-1 in the media_cdn module
 resource "aws_acm_certificate" "main" {
+  # NO provider override - uses default region (ap-southeast-2) for ALB
   count             = var.domain_name == "" ? 0 : 1
   domain_name       = var.domain_name
   validation_method = "DNS"
@@ -147,6 +153,7 @@ resource "aws_acm_certificate" "main" {
 }
 
 resource "aws_route53_record" "cert_validation" {
+  # Route53 is global - no provider needed
   for_each = local.dns_enabled ? {
     for dvo in aws_acm_certificate.main[0].domain_validation_options : dvo.domain_name => dvo
   } : {}
@@ -159,6 +166,7 @@ resource "aws_route53_record" "cert_validation" {
 }
 
 resource "aws_acm_certificate_validation" "main" {
+  # NO provider override - must match the certificate region (ap-southeast-2)
   count                   = local.dns_enabled ? 1 : 0
   certificate_arn         = aws_acm_certificate.main[0].arn
   validation_record_fqdns = [for r in aws_route53_record.cert_validation : r.fqdn]
@@ -193,4 +201,55 @@ output "hosted_zone_id" {
 output "hosted_zone_nameservers" {
   description = "Nameservers to configure at your domain registrar"
   value       = var.create_hosted_zone && var.domain_name != "" ? aws_route53_zone.main[0].name_servers : []
+}
+
+# ============================================================================
+# IMPORTANT: DNS CONFIGURATION REQUIRED
+# ============================================================================
+# After terraform apply, you MUST configure these nameservers at your domain
+# registrar for SSL certificate validation to complete.
+# See README.md for detailed instructions.
+# ============================================================================
+
+output "dns_configuration_required" {
+  description = "ACTION REQUIRED: Configure these nameservers at your domain registrar"
+  value = var.create_hosted_zone && var.domain_name != "" ? {
+    message      = "⚠️  ACTION REQUIRED: Update nameservers at your domain registrar"
+    domain       = var.domain_name
+    nameservers  = aws_route53_zone.main[0].name_servers
+    instructions = "Log into your domain registrar and set these 4 nameservers for ${var.domain_name}"
+    verify_cmd   = "dig NS ${var.domain_name} +short"
+  } : null
+}
+
+# Log nameserver configuration reminder during apply
+resource "terraform_data" "nameserver_reminder" {
+  count = var.create_hosted_zone && var.domain_name != "" ? 1 : 0
+
+  input = aws_route53_zone.main[0].name_servers
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      echo ""
+      echo "============================================================================"
+      echo "⚠️  IMPORTANT: DNS NAMESERVER CONFIGURATION REQUIRED"
+      echo "============================================================================"
+      echo ""
+      echo "Domain: ${var.domain_name}"
+      echo ""
+      echo "Configure these nameservers at your domain registrar:"
+      echo ""
+      %{for ns in aws_route53_zone.main[0].name_servers~}
+      echo "  • ${ns}"
+      %{endfor~}
+      echo ""
+      echo "Without this step, SSL certificate validation will NOT complete."
+      echo ""
+      echo "Verify with: dig NS ${var.domain_name} +short"
+      echo ""
+      echo "See README.md for detailed instructions."
+      echo "============================================================================"
+      echo ""
+    EOT
+  }
 }
