@@ -14,9 +14,9 @@ on:
   workflow_dispatch:
     inputs:
       tfvars_path:
-        description: "Path to the tfvars file (relative to infra/ directory)"
+        description: "Path to the tfvars file"
         required: true
-        default: "terraform.tfvars"
+        default: "infra/terraform.tfvars"
       backend_bucket:
         description: "S3 bucket name for Terraform remote state"
         type: choice
@@ -63,7 +63,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     env:
-      TFVARS: ${{ inputs.tfvars_path != '' && inputs.tfvars_path || 'terraform.tfvars' }}
+      TFVARS: ${{ inputs.tfvars_path != '' && inputs.tfvars_path || 'infra/terraform.tfvars' }}
       BACKEND_BUCKET: ${{ inputs.backend_bucket != '' && inputs.backend_bucket || secrets.TF_BACKEND_BUCKET }}
       BACKEND_KEY: ${{ inputs.backend_key != '' && inputs.backend_key || secrets.TF_BACKEND_KEY || 'dokuwiki/terraform.tfstate' }}
       BACKEND_REGION: ${{ inputs.backend_region != '' && inputs.backend_region || secrets.TF_BACKEND_REGION || 'us-east-1' }}
@@ -111,7 +111,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
-      TFVARS: ${{ inputs.tfvars_path != '' && inputs.tfvars_path || 'terraform.tfvars' }}
+      TFVARS: ${{ inputs.tfvars_path != '' && inputs.tfvars_path || 'infra/terraform.tfvars' }}
       BACKEND_BUCKET: ${{ inputs.backend_bucket != '' && inputs.backend_bucket || secrets.TF_BACKEND_BUCKET }}
       BACKEND_KEY: ${{ inputs.backend_key != '' && inputs.backend_key || secrets.TF_BACKEND_KEY || 'dokuwiki/terraform.tfstate' }}
       BACKEND_REGION: ${{ inputs.backend_region != '' && inputs.backend_region || secrets.TF_BACKEND_REGION || 'us-east-1' }}

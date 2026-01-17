@@ -1,4 +1,4 @@
-name: App Deploy
+name: Build & Push Image
 
 # Full application deployment pipeline:
 #   - build-and-apply: Builds Docker image, pushes to ECR, and applies Terraform

@@ -100,7 +100,7 @@ dig CNAME _validation-record-name.sysya.com.au +short
 **Monitor propagation (macOS - no `watch` by default):**
 ```bash
 # Loop to check every 30 seconds
-while true; do clear; date; echo "--- NS Records ---"; dig NS sysya.com.au @8.8.8.8 +short; sleep 30; done
+while true; do clear; date; echo "--- NS Records ---"; dig NS sysya.com.au @8.8.8.8 +short; sleep 5; done
 
 # Or install watch: brew install watch
 watch -n 30 'dig NS sysya.com.au @8.8.8.8 +short'
