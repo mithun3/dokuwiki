@@ -22,6 +22,8 @@ on:
           - "dokuwiki-app-repo"
       image_tag:
         description: "Optional image tag (defaults to commit SHA)"
+        required: true
+        default: "latest"
       tfvars_path:
         description: "Path to the tfvars file"
         required: true
