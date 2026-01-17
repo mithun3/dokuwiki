@@ -83,9 +83,6 @@ module "efs" {
 
 module "alb" {
   source          = "./modules/alb"
-  providers = {
-    aws.us_east_1 = aws.us_east_1
-  }
   name            = local.name_prefix
   vpc_id          = module.network.vpc_id
   subnet_ids      = module.network.public_subnet_ids
