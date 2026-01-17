@@ -17,19 +17,42 @@ Recommended layout:
 Initialize backend first, then plan/apply per env.
 
 What’s included now (starter wiring):
-- Network: VPC, public/private subnets, IGW, optional NAT.
-- EFS: filesystem + mount targets; ingress open to VPC CIDR by default (tighten to task SG later).
+- Network: VPC, public/private subnets, IGW, optional NAT.- ECR: repository for Docker images with lifecycle policy (keeps last 10 untagged images).- EFS: filesystem + mount targets; ingress open to VPC CIDR by default (tighten to task SG later).
 - ALB: HTTP/HTTPS listeners, target group, SG.
 - ECS Fargate: cluster/service/task with EFS mounts at /var/www/dokuwiki/{data,conf,lib/plugins}; env vars and ADMIN_PASSWORD via SSM secret.
 - ACM + Route53: DNS validation and alias A record to ALB.
 - Media CDN: S3 bucket (private, versioned, SSE-S3, CORS) + CloudFront with OAC; optional media.* Route53 alias and us-east-1 ACM.
 
 Quickstart
-1) Update terraform.tfvars with VPC CIDRs/AZs, domain/zone, ECR image, admin password SSM ARN.
+1) Update terraform.tfvars with VPC CIDRs/AZs, domain/zone, admin password SSM ARN.
 2) (Optional) Configure backend S3/DynamoDB in `terraform { backend "s3" { ... } }`.
 3) `terraform init`
 4) `terraform plan -var-file=terraform.tfvars`
 5) `terraform apply -var-file=terraform.tfvars`
+6) After apply, get the ECR URL from output: `terraform output ecr_repository_url`
+
+Building and pushing Docker images
+After infrastructure is created, build and push your Docker image:
+```bash
+# Get ECR repository URL from Terraform output
+ECR_URL=$(terraform output -raw ecr_repository_url)
+
+# Login to ECR
+aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin "$ECR_URL"
+
+# Build and push (from repo root)
+docker build -t "$ECR_URL:latest" -f app/Dockerfile .
+docker push "$ECR_URL:latest"
+```
+
+Manual ECR creation (if not using Terraform)
+If you need to create the ECR repository outside of Terraform:
+```bash
+aws ecr create-repository \
+  --repository-name dokuwiki-app-repo \
+  --region ap-southeast-2 \
+  --image-scanning-configuration scanOnPush=true
+```
 
 State backend bootstrap (one-time)
 - Use `scripts/tf-backend-bootstrap.sh` to create the remote backend (S3 + DynamoDB) with local state first: set env STATE_BUCKET, STATE_KEY, LOCK_TABLE, REGION, PROJECT.

@@ -47,6 +47,46 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+# ECR repository for Docker images
+resource "aws_ecr_repository" "app" {
+  name                 = "${var.project_name}-app-repo"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  encryption_configuration {
+    encryption_type = "AES256"
+  }
+
+  tags = {
+    Name = "${local.name_prefix}-ecr"
+  }
+}
+
+# Lifecycle policy to keep only the last 10 untagged images
+resource "aws_ecr_lifecycle_policy" "app" {
+  repository = aws_ecr_repository.app.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Keep last 10 untagged images"
+        selection = {
+          tagStatus   = "untagged"
+          countType   = "imageCountMoreThan"
+          countNumber = 10
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+}
+
 # Route53 hosted zone (create or use existing)
 resource "aws_route53_zone" "main" {
   count = var.create_hosted_zone && var.domain_name != "" ? 1 : 0
@@ -187,6 +227,7 @@ output "efs_id" { value = module.efs.file_system_id }
 output "cluster_id" { value = module.ecs.cluster_id }
 output "media_bucket" { value = module.media_cdn.bucket_name }
 output "media_cdn_domain" { value = module.media_cdn.cdn_domain }
+output "ecr_repository_url" { value = aws_ecr_repository.app.repository_url }
 output "app_cert_validation_records" {
   value = var.domain_name == "" ? [] : tolist(aws_acm_certificate.main[0].domain_validation_options)
 }
