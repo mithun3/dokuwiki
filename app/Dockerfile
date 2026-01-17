@@ -67,6 +67,21 @@ COPY app/supervisord.conf /etc/supervisord.conf
 COPY app/php.ini /usr/local/etc/php/conf.d/dokuwiki.ini
 COPY app/backup.sh /backup.sh
 
+# Custom branding assets (logo, favicon, etc.)
+# Copy assets directory, then move files if they exist
+COPY content/assets/ /tmp/assets/
+RUN if [ -f /tmp/assets/logo.png ]; then \
+      cp /tmp/assets/logo.png /var/www/dokuwiki/lib/tpl/dokuwiki/images/logo.png; \
+    fi && \
+    if [ -f /tmp/assets/favicon.ico ]; then \
+      cp /tmp/assets/favicon.ico /var/www/dokuwiki/lib/tpl/dokuwiki/images/favicon.ico; \
+    fi && \
+    if [ -f /tmp/assets/apple-touch-icon.png ]; then \
+      cp /tmp/assets/apple-touch-icon.png /var/www/dokuwiki/lib/tpl/dokuwiki/images/apple-touch-icon.png; \
+    fi && \
+    rm -rf /tmp/assets && \
+    chown -R www-data:www-data /var/www/dokuwiki/lib/tpl/dokuwiki/images/
+
 VOLUME ["/var/www/dokuwiki/data", "/var/www/dokuwiki/conf", "/var/www/dokuwiki/lib/plugins"]
 
 EXPOSE 80
