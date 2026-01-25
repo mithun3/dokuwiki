@@ -50,11 +50,14 @@ Visit http://localhost:3000 to preview the site.
 
 ### Step 4: Test Media Player
 
-1. Navigate to any page
-2. Click on an audio/video link (`.mp3`, `.wav`, `.mp4`)
-3. Verify the player appears at the bottom
-4. Navigate to another page - player should continue playing
-5. Test playlist controls (play, pause, next, previous)
+1. Navigate to `/audio` or `/video` pages
+2. Click on any media link to start playback
+3. Verify the player appears at the bottom-right
+4. Test playback controls: play/pause, skip, volume, seek
+5. Navigate to another page - music should continue playing ✨
+6. Click another media link - it should queue or replace (configurable)
+7. Test shuffle and repeat modes
+8. Refresh page - player state persists from localStorage
 
 ## 🎵 Media Player Features
 
@@ -68,7 +71,10 @@ Visit http://localhost:3000 to preview the site.
 - ✅ **Volume Control** - Adjustable volume with mute
 - ✅ **Playback Controls** - Play, pause, skip, seek
 - ✅ **Shuffle & Repeat** - Playlist modes
-- ✅ **Audio & Video Support** - MP3, WAV, MP4, WebM
+- ✅ **Audio & Video Support** - MP3, WAV, OGG, AAC, M4A, OPUS, FLAC, MP4, WebM, OGV
+- ✅ **Format Badges** - Visual format tags (mp3, mp4, etc.)
+- ✅ **Thumbnail Support** - Optional preview images for media files
+- ✅ **Media Cards** - Professional-looking clickable media previews
 
 ### How It Works
 
@@ -77,6 +83,57 @@ Visit http://localhost:3000 to preview the site.
 3. **Link Interception** - JavaScript detects clicks on media files
 4. **Client-Side Routing** - Next.js App Router prevents page reloads
 5. **localStorage Sync** - Persists queue and position on refresh
+6. **Format Detection** - Automatically extracts format from file extension
+7. **Metadata Extraction** - Reads `data-thumbnail`, `data-artist` attributes from links
+
+### Adding Media to Your Pages
+
+Use standard markdown links with optional data attributes:
+
+```markdown
+### Audio Example
+
+- [My Song](https://example.com/song.mp3 "data-artist=Artist Name" "data-thumbnail=https://example.com/cover.jpg")
+
+### Video Example
+
+- [My Video](https://example.com/video.mp4 "data-thumbnail=https://example.com/poster.jpg")
+```
+
+**Supported Data Attributes:**
+- `data-thumbnail` - Image URL for preview (works with all formats)
+- `data-artist` - Artist/Creator name (audio files)
+- `data-title` - Custom title (optional, defaults to link text)
+
+**Supported Formats:**
+
+| Audio | Video |
+|-------|-------|
+| MP3, WAV, OGG, AAC, M4A, OPUS, FLAC | MP4, WebM, OGV |
+
+### Media Card Component
+
+The media player now includes a professional `MediaCard` component that displays:
+- Large thumbnail image with overlay
+- Format badge (mp3, mp4, etc.) in top-right
+- Play button overlay on hover
+- Title and artist metadata
+- Color-coded format tags (blue for audio, orange for video)
+
+**Example Usage in MDX:**
+
+```mdx
+---
+title: "My Audio Collection"
+---
+
+# Featured Tracks
+
+Click any track below to play:
+
+- [Beautiful Song](https://cdn.example.com/track1.mp3 "data-thumbnail=https://cdn.example.com/covers/track1.jpg" "data-artist=The Artist")
+- [Another Track](https://cdn.example.com/track2.wav "data-thumbnail=https://cdn.example.com/covers/track2.jpg")
+```
 
 ### Queue Conflict Modal (Planned - Phase 2)
 
@@ -101,6 +158,8 @@ nextjs-wiki/
 │   │   └── MediaPlayer/
 │   │       ├── MediaPlayer.tsx          # Main player UI
 │   │       ├── MediaPlayerProvider.tsx  # Context + link interception
+│   │       ├── MediaCard.tsx            # Professional media preview cards
+│   │       ├── FormatBadge.tsx          # Format tag/badge component
 │   │       ├── PlayerControls.tsx       # Play/pause/skip buttons
 │   │       ├── PlayerProgress.tsx       # Progress bar + time
 │   │       └── PlayerVolume.tsx         # Volume slider
@@ -111,6 +170,8 @@ nextjs-wiki/
 ├── content/
 │   ├── recording.mdx            # Recording namespace index
 │   ├── sounds.mdx               # Sounds namespace index
+│   ├── audio.mdx                # Audio examples with working samples
+│   ├── video.mdx                # Video examples with working samples
 │   └── recording/
 │       ├── techniques.mdx
 │       ├── best-practices.mdx

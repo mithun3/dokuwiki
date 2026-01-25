@@ -6,6 +6,7 @@ export interface MediaTrack {
   type: 'audio' | 'video';
   thumbnail?: string;
   duration?: number;
+  format?: 'mp3' | 'wav' | 'ogg' | 'aac' | 'm4a' | 'opus' | 'flac' | 'mp4' | 'webm' | 'ogv';
 }
 
 export interface PlayerState {

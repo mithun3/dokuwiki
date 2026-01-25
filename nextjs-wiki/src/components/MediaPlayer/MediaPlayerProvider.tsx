@@ -43,6 +43,9 @@ export function MediaPlayerProvider({ children }: { children: React.ReactNode })
         // Extract title from link text or filename
         const title = link.textContent?.trim() || href.split('/').pop() || 'Unknown Track';
         
+        // Extract format
+        const format = extension as 'mp3' | 'wav' | 'ogg' | 'aac' | 'm4a' | 'opus' | 'flac' | 'mp4' | 'webm' | 'ogv';
+        
         const track: MediaTrack = {
           id: `${Date.now()}-${Math.random()}`,
           url: href,
@@ -50,6 +53,7 @@ export function MediaPlayerProvider({ children }: { children: React.ReactNode })
           type: isVideo ? 'video' : 'audio',
           artist: link.dataset.artist,
           thumbnail: link.dataset.thumbnail,
+          format,
         };
         
         // Check if something is already playing
