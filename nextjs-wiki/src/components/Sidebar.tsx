@@ -18,6 +18,14 @@ const navigationItems = [
     ],
   },
   { href: '/sounds', label: 'Sounds' },
+  { href: '/audio', label: 'Audio' },
+  { href: '/video', label: 'Video' },
+  { href: '/equipment', label: 'Equipment' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms of Service' },
+  { href: '/faq', label: 'FAQ' },
 ];
 
 export default function Sidebar() {
