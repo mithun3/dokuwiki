@@ -1,0 +1,372 @@
+---
+title: "uest practices"
+---
+
+# Recording Best Practices: Industry Standards & Professional Workflows
+
+## Introduction
+
+This guide compiles decades of professional recording wisdom, covering
+everything from pre-session preparation to file delivery. Following
+these best practices ensures consistent, high-quality results and smooth
+collaboration with clients, editors, and post-production teams.
+
+## Pre-Session Preparation
+
+### Equipment Verification
+
+\*The Day Before Recording:\*
+
+1.  \*Battery Check\*
+2.  Charge all rechargeable batteries to 100%
+3.  Test battery capacity under load
+4.  Carry 2-3x the expected battery requirement
+5.  Include backup disposable batteries (lithium preferred for
+    temperature stability)
+
+
+1.  \*Storage Media\*
+2.  Format cards in the recording device, not computer
+3.  Use high-quality SD cards (SanDisk Extreme Pro, Sony Tough series)
+4.  Verify write speeds exceed recorder requirements
+5.  Carry minimum 2x expected storage capacity
+
+
+1.  \*Cable Testing\*
+2.  Test every cable end-to-end with audio signal
+3.  Flex cables while testing to reveal intermittent faults
+4.  Label cables with length and last test date
+5.  Replace any cable showing degradation
+
+
+1.  \*Firmware Updates\*
+2.  Check manufacturer websites for updates
+3.  Never update firmware the day of a critical session
+4.  Test updates on non-critical recordings first
+5.  Maintain rollback capability
+
+### Environment Assessment
+
+\*Site Survey Checklist:\*
+
+- \[ \] Identify and eliminate noise sources (HVAC, refrigerators,
+  electronics)
+- \[ \] Test for electrical interference (ground loops, RF)
+- \[ \] Assess room acoustics and reflection points
+- \[ \] Identify power outlets and verify circuit capacity
+- \[ \] Note ambient noise floor at different times of day
+- \[ \] Plan microphone positions and cable runs
+
+## Gain Structure & Level Setting
+
+### The Complete Signal Chain
+
+Proper gain staging through the entire signal path is critical for
+optimal signal-to-noise ratio and headroom.
+
+\*Stage 1: Microphone to Preamp\*
+
+- Set preamp gain for healthy signal without clipping
+- Target peak levels at -18dBFS to -12dBFS
+- Leave headroom for unexpected transients
+
+\*Stage 2: Preamp to A/D Converter\*
+
+- Many modern devices combine these stages
+- Ensure converter is not clipped even if preamp meters show headroom
+- Watch for inter-sample peaks on digital meters
+
+\*Stage 3: Digital Recording Level\*
+
+- 24-bit recording: Target -18dBFS RMS, peaks at -6dBFS
+- 32-bit float recording: Level less critical, but maintain reasonable
+  levels
+- Never normalize during recording
+
+### The -18dBFS Standard
+
+Professional studios align to -18dBFS = 0 VU for several reasons:
+
+1.  \*Plugin Sweet Spot\*: Most audio plugins are designed for this
+    level
+2.  \*Headroom\*: Provides 18dB of headroom for transients
+3.  \*Analog Emulation\*: Matches the operating level of analog
+    equipment
+4.  \*Mixing Consistency\*: Prevents fader cramming and bus overloads
+
+### Limiter Configuration
+
+\*Hardware Limiter Settings:\*
+
+- Enable limiters as safety nets, not primary gain control
+- Set threshold 3-6dB below digital maximum
+- Use fast attack (0.1-1ms) to catch transients
+- Set release appropriately for source material
+- Ratio: True limiting (∞:1) or heavy compression (20:1)
+
+\*When Limiters Engage:\*
+
+- Occasional limiter activity is acceptable
+- Continuous limiting indicates gain is too high
+- Review limited sections for quality assessment
+
+## File Management & Naming Conventions
+
+### Professional Naming Standards
+
+\*Broadcast WAV (BWF) Naming Convention:\* ''\`
+\[Project\]\_\[Scene\]\_\[Take\]\_\[Description\].\[ext\]
+
+Examples: Documentary_INT01_T03_Interview.wav
+Ambience_Forest_T01_Dawn-Chorus.wav SFX_Door_T05_Metal-Slam.wav ''\`
+
+\*Field Recording Naming:\* ''\`
+\[Date\]\_\[Location\]\_\[Description\]\_\[Mic/Perspective\].\[ext\]
+
+Examples: 20260118_Sydney_Harbor_Traffic_ORTF.wav
+20260118_BlueMountains_Waterfall_Close_MS.wav ''\`
+
+### Metadata Standards
+
+\*Essential BWF Metadata:\*
+
+- Originator: Your name or company
+- Originator Reference: Unique identifier
+- Description: Detailed description of content
+- Time Reference: Timecode stamp
+- UMID: Unique Material Identifier
+
+\*Recommended Additional Metadata:\*
+
+- GPS coordinates (for field recordings)
+- Equipment used
+- Microphone positions
+- Weather conditions
+- Session notes
+
+### Folder Structure
+
+`` ` Project_Name/ ├── 01_Raw/ │ ├── Day_01/ │ └── Day_02/ ├── 02_Edited/ │ ├── Dialog/ │ ├── Ambience/ │ └── SFX/ ├── 03_Final/ │ ├── Stems/ │ └── Masters/ ├── 04_Documentation/ │ ├── Session_Notes/ │ └── Metadata/ └── 05_Backup/  ``\`
+
+## Backup Strategy
+
+### The 3-2-1 Rule
+
+\*Three Copies:\* Always maintain at least three copies of your data:
+
+1.  Primary working copy
+2.  Local backup (external drive)
+3.  Off-site backup (cloud or physical location)
+
+\*Two Different Media Types:\*
+
+- Internal SSD + External HDD
+- SD Card + NAS
+- Cloud + Physical
+
+\*One Off-Site:\*
+
+- Cloud backup (Backblaze, AWS S3, Google Drive)
+- Physical drive at separate location
+- Automated sync to remote server
+
+### Field Backup Workflow
+
+\*During Recording:\*
+
+- Use dual-card recording when available
+- Copy to laptop during breaks
+- Never erase cards until verified backup exists
+
+\*End of Day:\*
+
+- Copy all cards to laptop/portable drive
+- Verify copies with checksum validation
+- Format cards only after double-verification
+
+\*Checksum Verification:\* ''\`bash
+
+# Generate MD5 checksum
+
+md5sum original_file.wav \> checksum.md5
+
+# Verify copy
+
+md5sum -c checksum.md5 ''\`
+
+## Monitoring Standards
+
+### Reference Levels
+
+\*Calibrated Monitoring:\*
+
+- Calibrate monitors to 85dB SPL with -20dBFS pink noise (film standard)
+- Alternative: 79dB SPL for nearfield/smaller rooms
+- Use SPL meter at listening position
+
+\*Monitor Selection:\*
+
+- Use full-range monitors or monitors with subwoofer
+- Minimum frequency response: 50Hz-20kHz (±3dB)
+- Position monitors at ear level, forming equilateral triangle
+
+### Headphone Monitoring
+
+\*Field Recording:\*
+
+- Closed-back headphones for isolation
+- High impedance (80Ω+) for better noise rejection
+- Extended low frequency response essential
+
+\*Recommended Models:\*
+
+- Sony MDR-7506: Industry standard, detailed mids
+- Sennheiser HD 25: Durable, excellent isolation
+- Audio-Technica ATH-M50x: Extended bass response
+- Beyerdynamic DT 770 Pro: Comfortable for long sessions
+
+## Recording Environment Optimization
+
+### Noise Floor Targets
+
+\*Professional Standards:\*
+
+- Music studio: NC-15 to NC-20 (25-30dB SPL)
+- Broadcast studio: NC-20 to NC-25 (30-35dB SPL)
+- Voice-over booth: NC-15 or lower
+- Field recording: Depends on content, generally \<40dB desired
+
+### Electrical Considerations
+
+\*Power Quality:\*
+
+- Use dedicated circuits for audio equipment
+- Avoid sharing circuits with lighting dimmers or motors
+- Consider power conditioning for sensitive equipment
+- Test outlets for proper grounding
+
+\*Ground Loop Prevention:\*
+
+- Star grounding configuration
+- Lift grounds systematically to identify problems
+- Use balanced connections wherever possible
+- DI boxes with ground lift for instruments
+
+## Session Documentation
+
+### Recording Notes Template
+
+''\` SESSION DOCUMENTATION ===================== Date: Project:
+Location: Engineer:
+
+EQUIPMENT USED:
+
+- Recorder:
+- Microphones:
+- Preamps:
+- Other:
+
+SETTINGS:
+
+- Sample Rate:
+- Bit Depth:
+- File Format:
+- Gain Settings:
+
+ENVIRONMENT:
+
+- Room/Location:
+- Noise Sources:
+- Weather (if outdoor):
+- Temperature/Humidity:
+
+TAKES LOG:
+
+
+ISSUES/NOTES:
+
+''\`
+
+### Sound Report
+
+For film/video production, provide detailed sound reports:
+
+- Scene/slate numbers
+- Take numbers and preferred takes
+- Timecode sync information
+- Track assignments
+- Microphone usage per take
+- Any technical issues or notes for post
+
+## Quality Control
+
+### Pre-Delivery Checklist
+
+\*Technical Verification:\*
+
+- \[ \] All files play without errors
+- \[ \] No digital clipping (check with waveform analysis)
+- \[ \] No dropout or glitches
+- \[ \] Correct sample rate and bit depth
+- \[ \] Metadata properly embedded
+- \[ \] File names follow convention
+
+\*Content Verification:\*
+
+- \[ \] All required takes/scenes captured
+- \[ \] Audio matches notes and logs
+- \[ \] Quality meets project standards
+- \[ \] No missing channels or files
+
+### Listening QC Protocol
+
+1.  \*Full Playback\*: Listen to entire recording at reference level
+2.  \*Spot Check\*: Verify critical moments and transitions
+3.  \*Technical Analysis\*: Use meters and spectrum analyzers
+4.  \*Documentation\*: Note any issues with timestamps
+
+## Delivery Standards
+
+### Common Delivery Formats
+
+\*Broadcast/Film:\*
+
+- Format: Broadcast WAV (BWF)
+- Sample Rate: 48kHz
+- Bit Depth: 24-bit
+- Channels: Poly file or discrete mono files
+
+\*Music Production:\*
+
+- Format: WAV or AIFF
+- Sample Rate: Match session (typically 44.1kHz or 48kHz)
+- Bit Depth: 24-bit minimum
+
+\*Archival:\*
+
+- Format: BWF or FLAC (lossless)
+- Sample Rate: Original recording rate
+- Bit Depth: Original recording depth
+- Include full metadata
+
+### File Transfer
+
+\*Large File Delivery:\*
+
+- Aspera, Signiant, or MediaShuttle for broadcast
+- Frame.io or Dropbox for smaller productions
+- Hard drive shipping for massive projects
+- Include checksum files for verification
+
+## Conclusion
+
+These best practices represent the accumulated wisdom of professional
+audio engineers worldwide. While specific situations may require
+adaptation, following these guidelines ensures consistency, reliability,
+and quality in your recordings. Regular review and continuous
+improvement of your workflows will establish you as a trusted,
+professional recordist.
+
+---
+
+\*Last updated: January 2026\*
