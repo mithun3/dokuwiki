@@ -64,15 +64,15 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
       {/* Queue Panel */}
       <div
         ref={containerRef}
-        className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white dark:bg-gray-900 shadow-lg z-40 flex flex-col animate-in slide-in-from-right"
+        className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white shadow-lg z-40 flex flex-col animate-in slide-in-from-right"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-lg font-semibold text-gray-900">
               Queue
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500">
               {playlist.length} track{playlist.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -80,7 +80,7 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
             {playlist.length > 0 && (
               <button
                 onClick={() => clearPlaylist()}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-600 dark:text-gray-400"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
                 title="Clear queue"
               >
                 🗑️
@@ -88,7 +88,7 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
             )}
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
               aria-label="Close queue"
             >
               ✕
@@ -99,12 +99,12 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
         {/* Queue List */}
         <div className="flex-1 overflow-y-auto">
           {playlist.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
+            <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <p className="text-lg">📭</p>
               <p className="mt-2">Queue is empty</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-800">
+            <div className="divide-y divide-gray-100">
               {playlist.map((track, index) => {
                 const isCurrentTrack = index === currentIndex;
                 const isPastTrack = index < currentIndex;
@@ -116,10 +116,10 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
                     onClick={() => setCurrentIndex(index)}
                     className={`p-3 cursor-pointer transition-colors flex items-start gap-3 group ${
                       isCurrentTrack
-                        ? 'bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-600'
+                        ? 'bg-blue-50 border-l-4 border-blue-600'
                         : isPastTrack
-                        ? 'bg-gray-50 dark:bg-gray-800/50 opacity-50 hover:opacity-75'
-                        : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                        ? 'bg-gray-50 opacity-50 hover:opacity-75'
+                        : 'hover:bg-gray-50'
                     }`}
                   >
                     {/* Index or Playing Indicator */}
@@ -148,10 +148,10 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
                         <p
                           className={`text-sm font-medium truncate ${
                             isCurrentTrack
-                              ? 'text-gray-900 dark:text-white'
+                              ? 'text-gray-900'
                               : isPastTrack
-                              ? 'text-gray-600 dark:text-gray-400'
-                              : 'text-gray-900 dark:text-white'
+                              ? 'text-gray-600'
+                              : 'text-gray-900'
                           }`}
                         >
                           {track.title}
@@ -159,7 +159,7 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
                         {track.format && <FormatBadge format={track.format} type={track.type} />}
                       </div>
                       {track.artist && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        <p className="text-xs text-gray-500 truncate">
                           {track.artist}
                         </p>
                       )}
@@ -171,7 +171,7 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
                         e.stopPropagation();
                         removeFromPlaylist(track.id);
                       }}
-                      className="flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-all"
+                      className="flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 hover:bg-gray-200 rounded transition-all text-gray-600"
                       title="Remove from queue"
                     >
                       ✕
@@ -185,8 +185,8 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
 
         {/* Footer */}
         {playlist.length > 0 && (
-          <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800">
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="border-t border-gray-200 p-4 bg-gray-50">
+            <div className="text-sm text-gray-600">
               <p>
                 {currentIndex + 1} of {playlist.length} playing
               </p>
