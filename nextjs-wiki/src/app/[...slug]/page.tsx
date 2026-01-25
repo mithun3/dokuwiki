@@ -2,6 +2,11 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import { getContentBySlug, getAllContentSlugs } from '@/lib/content';
 import { notFound } from 'next/navigation';
 import remarkGfm from 'remark-gfm';
+import { MediaGallery } from '@/components/MediaPlayer/MediaGallery';
+
+const mdxComponents = {
+  MediaGallery,
+};
 
 export async function generateStaticParams() {
   const slugs = getAllContentSlugs();
@@ -36,6 +41,7 @@ export default function ContentPage({ params }: { params: { slug: string[] } }) 
     <article className="wiki-content">
       <MDXRemote
         source={content.content}
+        components={mdxComponents}
         options={{
           mdxOptions: {
             remarkPlugins: [remarkGfm],
