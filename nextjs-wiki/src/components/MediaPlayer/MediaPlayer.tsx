@@ -113,7 +113,7 @@ export default function MediaPlayer() {
       <div className={`media-player ${isVisible ? 'visible' : ''} ${isMini ? 'media-player-mini' : ''} bg-white`}>
         {/* Video Display */}
         {isVideo && (
-          <div className="w-full bg-black flex items-center justify-center" style={{ height: '270px' }}>
+          <div className="w-full bg-white flex items-center justify-center" style={{ height: '270px' }}>
             <video 
               ref={videoRef}
               className="w-full h-full"
