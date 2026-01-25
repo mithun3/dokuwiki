@@ -5,10 +5,13 @@ import { useMediaPlayerStore } from '@/lib/store';
 import PlayerControls from './PlayerControls';
 import PlayerProgress from './PlayerProgress';
 import PlayerVolume from './PlayerVolume';
+import { KeyboardShortcuts } from './KeyboardShortcuts';
+import { QueuePanel } from './QueuePanel';
 
 export default function MediaPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isQueueOpen, setIsQueueOpen] = useState(false);
   
   const {
     currentTrack,
@@ -104,6 +107,7 @@ export default function MediaPlayer() {
 
   return (
     <>
+      <KeyboardShortcuts />
       <audio ref={audioRef} style={{ display: 'none' }} />
       
       <div className={`media-player ${isVisible ? 'visible' : ''} ${isMini ? 'media-player-mini' : ''} bg-white`}>
@@ -140,6 +144,14 @@ export default function MediaPlayer() {
                 </div>
               )}
             </div>
+            {/* Queue Button */}
+            <button
+              onClick={() => setIsQueueOpen(!isQueueOpen)}
+              className="flex-shrink-0 p-2 hover:bg-gray-100 rounded transition text-gray-600"
+              title="Toggle queue"
+            >
+              📋
+            </button>
           </div>
 
           {/* Controls & Progress */}
@@ -154,6 +166,9 @@ export default function MediaPlayer() {
           </div>
         </div>
       </div>
+
+      {/* Queue Panel */}
+      <QueuePanel isOpen={isQueueOpen} onClose={() => setIsQueueOpen(false)} />
     </>
   );
 }

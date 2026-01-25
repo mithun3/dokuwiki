@@ -3,6 +3,12 @@ import { persist } from 'zustand/middleware';
 import type { MediaTrack, PlayerState } from '@/lib/types';
 
 interface MediaPlayerStore extends PlayerState {
+  // Modal state
+  queueConflictModal: {
+    isOpen: boolean;
+    currentTrack: MediaTrack | null;
+    newTrack: MediaTrack | null;
+  };
   // Actions
   setCurrentTrack: (track: MediaTrack | null) => void;
   setPlaylist: (tracks: MediaTrack[]) => void;
@@ -23,6 +29,8 @@ interface MediaPlayerStore extends PlayerState {
   playNext: () => void;
   playPrevious: () => void;
   togglePlayPause: () => void;
+  openQueueConflictModal: (currentTrack: MediaTrack, newTrack: MediaTrack) => void;
+  closeQueueConflictModal: () => void;
 }
 
 export const useMediaPlayerStore = create<MediaPlayerStore>()(
@@ -41,6 +49,11 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
       isMini: false,
       repeatMode: 'none',
       isShuffled: false,
+      queueConflictModal: {
+        isOpen: false,
+        currentTrack: null,
+        newTrack: null,
+      },
 
       // Actions
       setCurrentTrack: (track) => set({ currentTrack: track }),
@@ -209,6 +222,26 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
         if (currentTrack) {
           set({ isPlaying: !isPlaying });
         }
+      },
+
+      openQueueConflictModal: (currentTrack, newTrack) => {
+        set({
+          queueConflictModal: {
+            isOpen: true,
+            currentTrack,
+            newTrack,
+          },
+        });
+      },
+
+      closeQueueConflictModal: () => {
+        set({
+          queueConflictModal: {
+            isOpen: false,
+            currentTrack: null,
+            newTrack: null,
+          },
+        });
       },
     }),
     {

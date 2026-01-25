@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useMediaPlayerStore } from '@/lib/store';
 import type { MediaTrack } from '@/lib/types';
+import { QueueConflictModal } from './QueueConflictModal';
 
 interface MediaPlayerContextType {
   playTrack: (track: MediaTrack, replacePlaylist?: boolean) => void;
@@ -12,7 +13,15 @@ interface MediaPlayerContextType {
 const MediaPlayerContext = createContext<MediaPlayerContextType | undefined>(undefined);
 
 export function MediaPlayerProvider({ children }: { children: React.ReactNode }) {
-  const { playTrack: storePlayTrack, isPlaying, currentTrack } = useMediaPlayerStore();
+  const {
+    playTrack: storePlayTrack,
+    isPlaying,
+    currentTrack,
+    queueConflictModal,
+    openQueueConflictModal,
+    closeQueueConflictModal,
+    addToPlaylist,
+  } = useMediaPlayerStore();
 
   const playTrack = (track: MediaTrack, replacePlaylist = false) => {
     storePlayTrack(track, replacePlaylist);
@@ -58,9 +67,8 @@ export function MediaPlayerProvider({ children }: { children: React.ReactNode })
         
         // Check if something is already playing
         if (isPlaying && currentTrack) {
-          // Show queue modal - for now, just add to queue
-          // TODO: Implement queue conflict modal
-          playTrack(track, false);
+          // Show queue conflict modal
+          openQueueConflictModal(currentTrack, track);
         } else {
           playTrack(track, true);
         }
@@ -82,6 +90,30 @@ export function MediaPlayerProvider({ children }: { children: React.ReactNode })
   return (
     <MediaPlayerContext.Provider value={{ playTrack, interceptMediaLinks }}>
       {children}
+      <QueueConflictModal
+        isOpen={queueConflictModal.isOpen}
+        currentTrack={queueConflictModal.currentTrack}
+        newTrack={queueConflictModal.newTrack || { id: '', url: '', title: '', type: 'audio', format: 'mp3' }}
+        onReplace={() => {
+          if (queueConflictModal.newTrack) {
+            playTrack(queueConflictModal.newTrack, true);
+          }
+          closeQueueConflictModal();
+        }}
+        onPlayNext={() => {
+          if (queueConflictModal.newTrack) {
+            addToPlaylist(queueConflictModal.newTrack, 'next');
+          }
+          closeQueueConflictModal();
+        }}
+        onAddToQueue={() => {
+          if (queueConflictModal.newTrack) {
+            addToPlaylist(queueConflictModal.newTrack, 'end');
+          }
+          closeQueueConflictModal();
+        }}
+        onClose={closeQueueConflictModal}
+      />
     </MediaPlayerContext.Provider>
   );
 }
