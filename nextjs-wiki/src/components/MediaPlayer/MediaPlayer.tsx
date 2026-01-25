@@ -52,6 +52,7 @@ export default function MediaPlayer() {
     if (!media || !currentTrack) return;
 
     media.src = currentTrack.url;
+    media.load();
     media.currentTime = currentTime;
     
     if (isPlaying) {
@@ -85,7 +86,7 @@ export default function MediaPlayer() {
       media.removeEventListener('loadedmetadata', handleLoadedMetadata);
       media.removeEventListener('ended', handleEnded);
     };
-  }, []);
+  }, [currentTrack?.type, setCurrentTime, setDuration, playNext]);
 
   const handleSeek = (time: number) => {
     const media = mediaRef.current;
@@ -95,54 +96,61 @@ export default function MediaPlayer() {
     }
   };
 
+  const isVideo = currentTrack?.type === 'video';
+
   if (!isVisible || !currentTrack) {
-    return (
-      <>
-        <audio ref={audioRef} />
-        <video ref={videoRef} style={{ display: 'none' }} />
-      </>
-    );
+    return null;
   }
 
   return (
     <>
-      <audio ref={audioRef} />
-      <video ref={videoRef} style={{ display: 'none' }} />
+      <audio ref={audioRef} style={{ display: 'none' }} />
       
-      <div className={`media-player ${isVisible ? 'visible' : ''} ${isMini ? 'media-player-mini' : ''} bg-white border-t border-gray-200 shadow-lg`}>
-        <div className="container mx-auto px-4 h-full">
-          <div className="flex items-center justify-between h-full gap-4">
-            {/* Track Info */}
-            <div className="flex items-center gap-4 flex-1 min-w-0">
-              {currentTrack.thumbnail && (
-                <img 
-                  src={currentTrack.thumbnail} 
-                  alt={currentTrack.title}
-                  className="w-12 h-12 rounded object-cover"
-                />
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="font-semibold text-sm truncate">
-                  {currentTrack.title}
-                </div>
-                {currentTrack.artist && (
-                  <div className="text-xs text-gray-500 truncate">
-                    {currentTrack.artist}
-                  </div>
-                )}
+      <div className={`media-player ${isVisible ? 'visible' : ''} ${isMini ? 'media-player-mini' : ''} bg-white`}>
+        {/* Video Display */}
+        {isVideo && (
+          <div className="w-full bg-black flex items-center justify-center" style={{ height: '270px' }}>
+            <video 
+              ref={videoRef}
+              className="w-full h-full"
+              style={{ objectFit: 'contain' }}
+            />
+          </div>
+        )}
+        {!isVideo && <video ref={videoRef} style={{ display: 'none' }} />}
+        
+        {/* Controls Container */}
+        <div className="px-3 py-2">
+          {/* Track Info */}
+          <div className="flex items-center gap-2 mb-2">
+            {currentTrack.thumbnail && (
+              <img 
+                src={currentTrack.thumbnail} 
+                alt={currentTrack.title}
+                className="w-10 h-10 rounded object-cover"
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="font-semibold text-sm truncate">
+                {currentTrack.title}
               </div>
+              {currentTrack.artist && (
+                <div className="text-xs text-gray-500 truncate">
+                  {currentTrack.artist}
+                </div>
+              )}
             </div>
+          </div>
 
-            {/* Controls */}
-            <div className="flex-1 max-w-md">
-              <PlayerControls />
-              <PlayerProgress onSeek={handleSeek} />
-            </div>
+          {/* Controls & Progress */}
+          <div className="mb-2">
+            <PlayerControls />
+            <PlayerProgress onSeek={handleSeek} />
+          </div>
 
-            {/* Volume */}
-            <div className="flex items-center gap-4 flex-1 justify-end">
-              <PlayerVolume />
-            </div>
+          {/* Volume */}
+          <div className="flex items-center justify-end">
+            <PlayerVolume />
           </div>
         </div>
       </div>

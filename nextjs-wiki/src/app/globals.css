@@ -53,21 +53,24 @@
 /* Media Player Styles */
 .media-player {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: var(--player-height);
+  bottom: 20px;
+  right: 20px;
+  width: 480px;
+  max-width: calc(100vw - 40px);
   z-index: 50;
-  transform: translateY(100%);
+  transform: translateX(120%);
   transition: transform 0.3s ease-in-out;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .media-player.visible {
-  transform: translateY(0);
+  transform: translateX(0);
 }
 
 .media-player-mini {
-  height: 60px;
+  width: 320px;
 }
 
 /* Content padding when player is visible */
