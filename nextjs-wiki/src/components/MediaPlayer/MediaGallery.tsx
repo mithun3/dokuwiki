@@ -21,46 +21,9 @@ export function MediaGallery({ filter = 'all', className = '', items = [] }: Med
   const { playTrack, addToPlaylist, playlist } = useMediaPlayerStore();
 
   useEffect(() => {
-    // If items were provided directly, use those
-    if (items && items.length > 0) {
-      const mediaExtensions = /\.(mp3|wav|m4a|aac|ogg|opus|flac|mp4|webm|ogv)(\?.*)?$/i;
-      const discovered: MediaTrack[] = [];
-
-      items.forEach((item) => {
-        if (!item || !item.url) return;
-        
-        const match = item.url.match(mediaExtensions);
-        if (!match) return;
-
-        const extension = match[1].toLowerCase();
-        const isVideo = ['mp4', 'webm', 'ogv'].includes(extension);
-
-        const track: MediaTrack = {
-          id: item.url,
-          url: item.url,
-          title: item.title || item.url.split('/').pop() || 'Unknown Track',
-          type: isVideo ? 'video' : 'audio',
-          artist: item.artist,
-          thumbnail: item.thumbnail,
-          format: extension as any,
-        };
-
-        // Apply filter
-        if (filter === 'audio' && track.type === 'video') return;
-        if (filter === 'video' && track.type === 'audio') return;
-
-        discovered.push(track);
-      });
-
-      console.log(`[MediaGallery] Processing ${items.length} items from props, discovered ${discovered.length}`);
-      setMediaItems(discovered);
-      return;
-    }
-
-    // Otherwise, scan the DOM for media links (fallback for backward compatibility)
     const discoverMedia = () => {
       const mediaExtensions = /\.(mp3|wav|m4a|aac|ogg|opus|flac|mp4|webm|ogv)(\?.*)?$/i;
-      const allAnchors = Array.from(document.querySelectorAll('a')) as HTMLAnchorElement[];
+      const allAnchors = Array.from(document.querySelectorAll('a[href]')) as HTMLAnchorElement[];
 
       const discovered: MediaTrack[] = [];
       const seenUrls = new Set<string>();
@@ -76,7 +39,9 @@ export function MediaGallery({ filter = 'all', className = '', items = [] }: Med
 
         const extension = match[1].toLowerCase();
         const isVideo = ['mp4', 'webm', 'ogv'].includes(extension);
-        const title = link.textContent?.trim() || href.split('/').pop() || 'Unknown Track';
+        
+        // Try to get title from data attributes first, then fallback to text content
+        const title = link.dataset.title || link.textContent?.trim() || href.split('/').pop() || 'Unknown Track';
 
         const track: MediaTrack = {
           id: href,
@@ -95,22 +60,23 @@ export function MediaGallery({ filter = 'all', className = '', items = [] }: Med
         discovered.push(track);
       });
 
-      console.log(`[MediaGallery] DOM scan found ${discovered.length} items`);
-      setMediaItems(discovered);
+      if (discovered.length > 0) {
+        setMediaItems(discovered);
+      }
     };
 
-    // Run multiple scans with delays
+    // Run scans with multiple delays to ensure DOM is ready
     discoverMedia();
-    const timeout1 = setTimeout(discoverMedia, 100);
-    const timeout2 = setTimeout(discoverMedia, 300);
-    const timeout3 = setTimeout(discoverMedia, 700);
+    const timeout1 = setTimeout(discoverMedia, 50);
+    const timeout2 = setTimeout(discoverMedia, 200);
+    const timeout3 = setTimeout(discoverMedia, 500);
 
     return () => {
       clearTimeout(timeout1);
       clearTimeout(timeout2);
       clearTimeout(timeout3);
     };
-  }, [filter, items]);
+  }, [filter]);
 
   if (mediaItems.length === 0) {
     return (
