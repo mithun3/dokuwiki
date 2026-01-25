@@ -1,8 +1,0 @@
-====== Sound Packs ======
-
-Browse curated packs. Replace download URLs with your S3/CloudFront links.
-
-  * [[urban-ambience|Urban Ambience]] — city beds, subway hums, café loops.
-  * [[foley-essentials|Foley Essentials]] — cloth, paper, doors, props.
-
-Want to add more? Duplicate a pack page and update metadata and links.
