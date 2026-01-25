@@ -68,7 +68,7 @@ jobs:
       BACKEND_KEY: ${{ inputs.backend_key != '' && inputs.backend_key || secrets.TF_BACKEND_KEY || 'dokuwiki/terraform.tfstate' }}
       BACKEND_REGION: ${{ inputs.backend_region != '' && inputs.backend_region || secrets.TF_BACKEND_REGION || 'ap-southeast-2' }}
       BACKEND_DDB_TABLE: ${{ inputs.backend_dynamodb_table != '' && inputs.backend_dynamodb_table || secrets.TF_BACKEND_DDB_TABLE }}
-      ECR_REPOSITORY: ${{ inputs.ecr_repository != '' && inputs.ecr_repository || secrets.ECR_REPOSITORY }}
+      ECR_REPOSITORY: ${{ inputs.ecr_repository != '' && inputs.ecr_repository || secrets.ECR_REPOSITORY || 'dokuwiki-app-repo' }}
       IMAGE_TAG_INPUT: ${{ inputs.image_tag }}
     steps:
       - uses: actions/checkout@v4
