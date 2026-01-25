@@ -21,31 +21,6 @@ TASK_ARN=$(aws ecs list-tasks --cluster "$CLUSTER" --service-name "$SERVICE" --r
 TASK_ID=$(echo "$TASK_ARN" | awk -F'/' '{print $NF}')
 log "Task: $TASK_ID"
 
-# Function to convert markdown to DokuWiki syntax
-convert_md() {
-  sed \
-    -e 's/^# \(.*\)/====== \1 ======/' \
-    -e 's/^## \(.*\)/===== \1 =====/' \
-    -e 's/^### \(.*\)/==== \1 ====/' \
-    -e 's/^#### \(.*\)/=== \1 ===/' \
-    -e 's/^- /  * /' \
-    -e 's/^  - /    * /' \
-    -e 's/^    - /      * /' \
-    -e 's/^1\. /  - /' \
-    -e 's/^2\. /  - /' \
-    -e 's/^3\. /  - /' \
-    -e 's/^4\. /  - /' \
-    -e 's/^5\. /  - /' \
-    -e 's/\*\*\([^*]*\)\*\*/*\1*/g' \
-    -e "s/\`\([^\`]*\)\`/'\1'/g" \
-    -e 's/!\[\([^]]*\)\](\([^)]*\))/{{:\2|\1}}/g' \
-    -e 's/\[\([^]]*\)\](\([^)]*\)\.md)/[[\2|\1]]/g' \
-    -e 's/\[\([^]]*\)\](\([^)]*\))/[[\2|\1]]/g' | \
-  sed -e 's|\[\[\([^]/|]*\)/|\[[\1:|g' \
-      -e 's|\[\[\([^]/|]*\)/|\[[\1:|g' \
-      -e 's|\[\[\([^]/|]*\)/|\[[\1:|g'
-}
-
 # Function to run command in container
 exec_cmd() {
   aws ecs execute-command \
@@ -63,21 +38,21 @@ upload_file() {
   local dest="$2"
   local content
   
-  # Convert and escape for shell
-  content=$(cat "$src" | convert_md | sed "s/'/'\\\\''/g")
+  # Read and escape for shell
+  content=$(cat "$src" | sed "s/'/'\\\\''/g")
   
   # Create directory and write file
   local dir=$(dirname "$dest")
   exec_cmd "sh -c 'mkdir -p $dir && printf \"%s\" \"$content\" > $dest && chown www-data:www-data $dest'"
 }
 
-# Sync all markdown files
+# Sync all DokuWiki files
 log "Syncing content..."
 
-find "$CONTENT_DIR" -name "*.md" -type f | while read -r src; do
-  # Get relative path and convert to destination
+find "$CONTENT_DIR" -name "*.txt" -type f | while read -r src; do
+  # Get relative path
   rel="${src#$CONTENT_DIR/}"
-  dest="$PAGES_PATH/${rel%.md}.txt"
+  dest="$PAGES_PATH/$rel"
   
   log "Syncing: $rel -> $dest"
   upload_file "$src" "$dest"

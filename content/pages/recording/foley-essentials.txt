@@ -1,0 +1,27 @@
+====== Foley Essentials ======
+
+===== What's inside =====
+
+  * 24-bit/48 kHz WAV takes
+  * Cloth swishes, paper flips, door latches, footsteps (wood/tile), small object handling
+  * Labeled per take for quick cut-and-place
+
+===== Preview =====
+
+  * MP3 preview: [[https:::example-cdn:soundpacks/foley-essentials/preview.mp3|Listen]]
+
+===== Download =====
+
+  * WAV bundle: [[https:::example-cdn:soundpacks/foley-essentials/foley-essentials.zip|foley-essentials.zip]]
+
+===== Notes =====
+
+  * Close-miked cardioids; minimal processing; peaks around -12 dBFS.
+  * Footsteps include multiple shoes and surfaces.
+
+===== Images =====
+
+{{:../media/soundpacks/foley-cover.jpg|Foley Cover}}
+{{:../media/soundpacks/foley-waveform.png|Foley Waveform}}
+
+Replace links and images with your real S3/CloudFront URLs and uploaded media.

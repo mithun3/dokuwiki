@@ -1,0 +1,23 @@
+====== Welcome to the Field Recording Library ======
+
+This wiki is pre-seeded and ready to browse. No installer, no setup — just start exploring.
+
+===== Catalogs =====
+
+  * [[recording:recording|Recordings]] — gear checklist, setups, and file hygiene.
+  * [[sounds:sounds|Sounds]] — curated packs ready to drop into your sessions.
+    * [[sounds:urban-ambience|Urban Ambience]] — beds, subway hums, city loops.
+    * [[sounds:foley-essentials|Foley Essentials]] — cloth, paper, props, doors.
+
+===== Highlights =====
+
+  * Field kit quick-start: mic placement, wind control, and take naming in the guide.
+  * Preview and swap in your own WAVs/MP3s for each pack page.
+  * All visitors can read; admins can update and publish.
+
+===== Get Started =====
+
+  - Browse the [[recording:recording|guide]] to see the recommended setup.
+  - Grab a pack from [[sounds:sounds|Sounds]] to prototype your mix.
+  - Replace placeholder media in 'recording/' and 'sounds/' with your assets.
+  - Login with your admin account to edit; add demo users by starting with 'DEMO_USERS=1'.

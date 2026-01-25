@@ -4,7 +4,7 @@ This repository seeds infrastructure, application image, and content-as-code for
 
 - `infra/`: Terraform skeleton (AWS provider, tagging, backend placeholders). Add modules for VPC, ALB/WAF, EFS, compute (ECS/EC2), Route53, ACM, backups.
 - `app/`: Dockerfile with nginx + php-fpm + DokuWiki (stable tarball), supervisor, nginx/php configs, and volume mounts for persistence.
-- `content/`: Markdown-first authoring folder; mount into the container or convert via CI before deploy.
+- `content/pages/`: DokuWiki-native `.txt` files (git-tracked source of truth for pages).
 - `docker-compose.yml`: local runner exposing http://localhost:8080; volumes keep data/config/plugins persistent on your machine. Use `ADMIN_PASSWORD=changeme DEMO_USERS=1` for seeded users; set `S3_BACKUP_BUCKET` (+ optional `S3_BACKUP_PREFIX`, `S3_BACKUP_ON_START=1`) to snapshot state to S3 at startup; set `S3_BACKUP_CRON` for recurring uploads. Nginx is configured for DokuWiki pretty URLs.
 
 ---

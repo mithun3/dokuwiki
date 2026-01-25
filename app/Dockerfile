@@ -44,18 +44,11 @@ RUN set -eux; \
   # Backup built-in plugins so we can restore them after EFS mount
   cp -a "${DOKUWIKI_PATH}/lib/plugins" /opt/plugins-builtin
 
-# Seed config/content that will be copied to writable volumes on first run
+# Seed config that will be copied to writable volumes on first run
 COPY app/seed/ /opt/dokuseed/
 
-# Copy markdown content and conversion script
-COPY app/md2doku.sh /opt/md2doku.sh
-COPY content/pages/ /opt/content-md/
-
-# Convert markdown to DokuWiki and copy to seed
-RUN chmod +x /opt/md2doku.sh && \
-    mkdir -p /opt/dokuseed/data/pages && \
-    /opt/md2doku.sh /opt/content-md /opt/dokuseed/data/pages && \
-    rm -rf /opt/content-md
+# Copy content pages (pre-converted to DokuWiki .txt format) to seed directory
+COPY content/pages/ /opt/dokuseed/data/pages/
 
 # Entrypoint handles first-run seeding (conf/users/acl/pages) and then starts supervisord
 COPY app/entrypoint.sh /entrypoint.sh

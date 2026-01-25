@@ -1,0 +1,51 @@
+====== Recording Field Sounds: Starter Guide ======
+
+Field recording is easy to start with a lightweight kit. This page is pre-baked so the wiki works without running the installer.
+
+===== In-Depth Guides =====
+
+Explore our comprehensive recording resources:
+
+  * *[[techniques|Recording Techniques]]* - Microphone placement, stereo techniques (X/Y, ORTF, M/S, Blumlein), room acoustics, and digital recording considerations
+  * *[[best-practices|Best Practices]]* - Industry standards for gain staging, file management, backup strategies, monitoring, and quality control
+  * *[[equipment-guide|Equipment Guide]]* - Definitive guide to portable recorders, studio interfaces, and live recording gear
+  * *[[my-equipment|My Equipment]]* - Personal rig documentation including MixPre-10 II, RME Fireface UFX+, Orion 32+, and microphone collection
+
+===== Quick Checklist =====
+
+  * Recorder with XLR inputs (Zoom H5/H6 or Tascam DR-40X)
+  * Two matched cardioid mics (or the built-in XY pair)
+  * Closed-back headphones
+  * Wind protection: deadcat + foam
+  * Extra SD card and batteries
+
+===== Setup =====
+
+  - 24-bit/48 kHz WAV
+  - Low-cut at 80–100 Hz to tame rumble
+  - Peaks around -12 dBFS
+  - Monitor with headphones; disable limiter unless needed
+
+===== Mic Placement =====
+
+  * *Ambience*: XY mics forward at chest height; avoid hard surfaces behind you.
+  * *Foley/objects*: mics 30–60 cm from source; angle 90° to reduce plosives.
+  * *Vehicles*: stay upwind; lower gain before pass-bys.
+
+{{:../media/recording/mic-placement.jpg|Mic Placement}}
+{{:../media/recording/wind-protection.jpg|Wind Protection}}
+
+===== File Hygiene =====
+
+  * Name takes 'YYYYMMDD_location_subject_take.wav'.
+  * Keep 'notes' with weather, gain, retries.
+  * Light normalization only; avoid heavy EQ/NR on masters.
+  * Export an MP3 preview at -14 LUFS; keep WAVs untouched.
+
+===== Publishing =====
+
+  * Host WAVs on S3/CloudFront.
+  * Link to packs here; embed the preview.
+  * Add a client-side PayPal donate button on the pack page.
+
+Replace the placeholder images by adding real files under 'recording/' in the media manager.

@@ -1,6 +1,18 @@
-# Content as Code
+# Content as Code - DokuWiki Pages
 
-- Author posts as Markdown under `pages/` (e.g., `pages/2026-01-hello-world.md`).
-- Media binaries live under `media/` and should be stored in S3/CloudFront for production; keep small placeholders here for previews.
-- If you mount these into the container (`docker-compose.yml` commented lines), ensure a Markdown-to-DokuWiki plugin is enabled inside the wiki.
-- For production, prefer a CI step that converts or syncs Markdown into DokuWiki pages before deploy.
+All wiki pages are authored directly in native DokuWiki `.txt` format in this directory.
+
+**Current source of truth:** Pages are in [`pages/`](./pages/) subdirectory (git-tracked).
+
+## Structure
+
+```
+pages/
+├── home.txt
+├── sidebar.txt
+├── recording/
+└── sounds/
+```
+
+All `.txt` files are in DokuWiki native syntax and are copied into the Docker image during build. See [`docs/ADDING-CONTENT.md`](../docs/ADDING-CONTENT.md) for the workflow.
+

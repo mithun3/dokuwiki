@@ -4,7 +4,7 @@
  */
 
 // Basic settings
-$conf['title'] = 'Field Recording Wiki';
+$conf['title'] = 'sysya';
 $conf['lang'] = 'en';
 $conf['template'] = 'dokuwiki';
 $conf['tagline'] = '';
