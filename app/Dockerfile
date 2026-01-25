@@ -42,7 +42,12 @@ RUN set -eux; \
   [ -f "${DOKUWIKI_PATH}/doku.php" ]; \
   chown -R www-data:www-data "${DOKUWIKI_PATH}"; \
   # Backup built-in plugins so we can restore them after EFS mount
-  cp -a "${DOKUWIKI_PATH}/lib/plugins" /opt/plugins-builtin
+  cp -a "${DOKUWIKI_PATH}/lib/plugins" /opt/plugins-builtin; \
+  # Clear any cache artifacts from fresh install (ensures clean image)
+  rm -rf "${DOKUWIKI_PATH}/data/cache"/* \
+         "${DOKUWIKI_PATH}/data/index"/* \
+         "${DOKUWIKI_PATH}/data/tmp"/* \
+         "${DOKUWIKI_PATH}/data/locks"/*
 
 # Seed config that will be copied to writable volumes on first run
 COPY app/seed/ /opt/dokuseed/

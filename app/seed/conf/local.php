@@ -4,7 +4,7 @@
  */
 
 // Basic settings
-$conf['title'] = 'sysya';
+$conf['title'] = 'audio / recording / sounds / technology';
 $conf['lang'] = 'en';
 $conf['template'] = 'dokuwiki';
 $conf['tagline'] = '';

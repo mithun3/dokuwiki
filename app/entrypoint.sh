@@ -14,6 +14,15 @@ log "DATA_DIR=$DATA_DIR"
 log "CONF_DIR=$CONF_DIR"
 log "SEED_DIR=$SEED_DIR"
 
+# Clear cache if requested (e.g., after config changes, plugin updates, deployments)
+if [ "${CLEAR_CACHE_ON_START:-0}" = "1" ]; then
+  log "CLEAR_CACHE_ON_START=1 detected, clearing caches..."
+  rm -rf "$DATA_DIR/cache"/* 2>/dev/null || true
+  rm -rf "$DATA_DIR/index"/* 2>/dev/null || true
+  rm -rf "$DATA_DIR/tmp"/* 2>/dev/null || true
+  log "Cache cleared successfully"
+fi
+
 copy_if_empty() {
   src="$1"
   dest="$2"

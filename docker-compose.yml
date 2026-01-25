@@ -13,6 +13,7 @@ services:
       - S3_BACKUP_PREFIX=${S3_BACKUP_PREFIX:-dokuwiki}
       - S3_BACKUP_ON_START=${S3_BACKUP_ON_START:-0}
       - S3_BACKUP_CRON=${S3_BACKUP_CRON:-}
+      - CLEAR_CACHE_ON_START=${CLEAR_CACHE_ON_START:-0}
     volumes:
       # For local dev: bind mount converted pages from content/
       # In production (ECS), these are EFS volumes seeded by entrypoint

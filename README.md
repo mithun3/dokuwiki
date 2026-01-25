@@ -218,6 +218,104 @@ Manual trigger: Go to **Actions** → **Build & Push Image** → **Run workflow*
 
 ---
 
+## 🧹 Cache Management
+
+DokuWiki caches rendered pages, search indexes, and temporary data for performance. Changes to configuration, pages, or plugins require cache clearing to take effect immediately.
+
+### How Cache Invalidation Works
+
+We implement a **3-layer cache strategy**:
+
+1. **Docker Build Time** - Cache directories are cleared when building the image
+2. **Container Startup** - Optional cache clear via `CLEAR_CACHE_ON_START=1` environment variable
+3. **Post-Deployment** - GitHub Actions workflow clears cache 2 minutes after ECS deploy completes
+
+### Cache Locations
+
+DokuWiki uses these directories for caching:
+
+```
+/var/www/dokuwiki/data/
+├── cache/      # Rendered page cache (HTML output)
+├── index/      # Full-text search index
+├── tmp/        # Temporary work files
+└── locks/      # Write lock files
+```
+
+### Clear Cache: Local Development
+
+**Option 1: Restart container with cache clear flag**
+```bash
+CLEAR_CACHE_ON_START=1 docker-compose up -d dokuwiki
+```
+
+**Option 2: Manual clear (container running)**
+```bash
+docker-compose exec dokuwiki sh -c '\
+  rm -rf /var/www/dokuwiki/data/cache/* && \
+  rm -rf /var/www/dokuwiki/data/index/* && \
+  rm -rf /var/www/dokuwiki/data/tmp/* && \
+  echo "✓ Cache cleared"'
+```
+
+**Option 3: CLI inside container**
+```bash
+docker-compose exec dokuwiki sh
+# rm -rf /var/www/dokuwiki/data/cache/*
+# rm -rf /var/www/dokuwiki/data/index/*
+# rm -rf /var/www/dokuwiki/data/tmp/*
+```
+
+### Clear Cache: Production (ECS)
+
+**Automatic**: Deployed after each successful `Deploy to ECS` workflow run (runs ~2 minutes after deploy).
+
+**Manual: Via AWS CLI**
+```bash
+# 1. Get running task ARN
+TASK_ARN=$(aws ecs list-tasks \
+  --cluster dokuwiki-prod-cluster \
+  --service-name dokuwiki-prod-svc \
+  --desired-status RUNNING \
+  --query 'taskArns[0]' --output text \
+  --region ap-southeast-2)
+
+# 2. Execute clear command
+aws ecs execute-command \
+  --cluster dokuwiki-prod-cluster \
+  --task "$TASK_ARN" \
+  --container dokuwiki \
+  --interactive \
+  --command "/bin/sh -c 'rm -rf /var/www/dokuwiki/data/cache/* && rm -rf /var/www/dokuwiki/data/index/* && rm -rf /var/www/dokuwiki/data/tmp/* && echo \"Cache cleared\"'" \
+  --region ap-southeast-2
+```
+
+**Manual: Via deploy script**
+```bash
+AWS_PROFILE=my-creds ./scripts/deploy-ecr-image.sh --clear-cache
+```
+
+### When to Clear Cache
+
+- **After config changes** - If `local.php` has been modified (e.g., title, theme)
+- **After plugin installation/update** - New plugins or plugin versions need index rebuild
+- **After content bulk imports** - Large page uploads or migrations
+- **After page deletes** - Ensure old pages aren't served from cache
+- **Troubleshooting** - Always try clearing cache before debugging rendering issues
+
+### Disable Automatic Cache Clear
+
+If you want to keep cache on container restart:
+
+```bash
+# docker-compose.yml or ECS task definition
+CLEAR_CACHE_ON_START=0
+```
+
+Or don't set it (defaults to `0`).
+
+---
+
 Next steps:
 1) Initialize Terraform backend (S3 + DynamoDB), then create modules and per-env stacks under `infra/`.
 2) Build/push the app image to ECR; wire ECS/ALB/EFS in Terraform.
