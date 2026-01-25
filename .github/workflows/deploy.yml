@@ -1,12 +1,15 @@
 name: Deploy to ECS
 
-# ECS deployment workflow (manual trigger only):
-#   - deploy: Verifies image exists in ECR and updates ECS service
-#
-# Use this for deploying a specific image tag to an environment
-# without rebuilding or re-applying infrastructure.
+# ECS deployment workflow:
+#   - Automatically runs after successful build-push.yml on main
+#   - Can also be triggered manually
+#   - Deploys image to ECS without rebuilding infrastructure
 
 on:
+  workflow_run:
+    workflows: ["Build & Push Image"]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       image_tag:
