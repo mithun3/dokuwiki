@@ -59,7 +59,7 @@ VERCEL_PROJECT_ID: prj_CwyWDXzKa9IHDpBIUoguOU3V4OgX
 6. Click "Create" and **copy token immediately** (won't show again!)
 
 ### Step 2: Configure GitHub Secrets
-Visit: https://github.com/mithunselvan/dokuwiki/settings/secrets/actions
+Visit: https://github.com/mithun3/dokuwiki/settings/secrets/actions
 
 Create 3 secrets:
 ```
@@ -69,7 +69,7 @@ Create 3 secrets:
 ```
 
 ### Step 3: Configure GitHub Actions Permissions
-Visit: https://github.com/mithunselvan/dokuwiki/settings/actions/permissions
+Visit: https://github.com/mithun3/dokuwiki/settings/actions/permissions
 
 - ✅ Select "Read and write permissions"
 - ✅ Check "Allow GitHub Actions to create and approve pull requests"
@@ -98,10 +98,10 @@ git commit -m "test: verify GitHub Actions deployment"
 git push origin test/github-actions-setup
 
 # Create PR on GitHub
-# https://github.com/mithunselvan/dokuwiki/pulls
+# https://github.com/mithun3/dokuwiki/pulls
 
 # Watch workflow run
-# https://github.com/mithunselvan/dokuwiki/actions
+# https://github.com/mithun3/dokuwiki/actions
 
 # Expected results:
 # - "Test" workflow runs ✅
@@ -184,8 +184,8 @@ Automated verification that:
 
 1. **Complete Manual Setup** (15-20 min):
    - Create Vercel token: https://vercel.com/account/tokens
-   - Set GitHub secrets: https://github.com/mithunselvan/dokuwiki/settings/secrets/actions
-   - Configure permissions: https://github.com/mithunselvan/dokuwiki/settings/actions/permissions
+   - Set GitHub secrets: https://github.com/mithun3/dokuwiki/settings/secrets/actions
+   - Configure permissions: https://github.com/mithun3/dokuwiki/settings/actions/permissions
 
 2. **Run Verification** (2 min):
    ```bash
@@ -239,11 +239,11 @@ Project Status: 70% → 80% COMPLETE
 
 **Setup & Configuration:**
 - Vercel Tokens: https://vercel.com/account/tokens
-- GitHub Secrets: https://github.com/mithunselvan/dokuwiki/settings/secrets/actions
-- GitHub Actions: https://github.com/mithunselvan/dokuwiki/settings/actions/permissions
+- GitHub Secrets: https://github.com/mithun3/dokuwiki/settings/secrets/actions
+- GitHub Actions: https://github.com/mithun3/dokuwiki/settings/actions/permissions
 
 **Monitoring & Deployment:**
-- GitHub Actions Runs: https://github.com/mithunselvan/dokuwiki/actions
+- GitHub Actions Runs: https://github.com/mithun3/dokuwiki/actions
 - Vercel Dashboard: https://vercel.com/dashboard/projects/nextjs-wiki
 - Vercel Deployments: https://vercel.com/dashboard/projects/nextjs-wiki/deployments
 

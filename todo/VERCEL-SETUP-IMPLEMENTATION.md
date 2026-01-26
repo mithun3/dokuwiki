@@ -43,7 +43,7 @@
 ### Option A: Using GitHub Web UI (Recommended if CLI not set up)
 
 1. **Go to your repository settings**:
-   - URL: `https://github.com/mithunselvan/dokuwiki/settings/secrets/actions`
+   - URL: `https://github.com/mithun3/dokuwiki/settings/secrets/actions`
    - OR: GitHub → Your Repo → Settings → Secrets and variables → Actions
 
 2. **Click "New repository secret"** button
@@ -92,7 +92,7 @@ gh secret list
 ## STEP 3: Configure GitHub Actions Permissions
 
 1. **Go to Actions permissions**:
-   - URL: `https://github.com/mithunselvan/dokuwiki/settings/actions/permissions`
+   - URL: `https://github.com/mithun3/dokuwiki/settings/actions/permissions`
    - OR: Settings → Actions → General → Permissions
 
 2. **Under "Workflow permissions"**:
@@ -114,20 +114,20 @@ cat nextjs-wiki/.vercel/project.json
 ```
 
 ### Check 2: Verify GitHub Secrets Set
-Go to: https://github.com/mithunselvan/dokuwiki/settings/secrets/actions
+Go to: https://github.com/mithun3/dokuwiki/settings/secrets/actions
 - Should see three secrets listed (values are hidden):
   - ✅ VERCEL_TOKEN
   - ✅ VERCEL_ORG_ID
   - ✅ VERCEL_PROJECT_ID
 
 ### Check 3: Verify GitHub Workflows
-Go to: https://github.com/mithunselvan/dokuwiki/actions
+Go to: https://github.com/mithun3/dokuwiki/actions
 - Should see workflow files:
   - ✅ Deploy to Vercel (deploy.yml)
   - ✅ Test (test.yml)
 
 ### Check 4: Verify GitHub Actions Permissions
-Go to: https://github.com/mithunselvan/dokuwiki/settings/actions/permissions
+Go to: https://github.com/mithun3/dokuwiki/settings/actions/permissions
 - ✅ "Read and write permissions" selected
 - ✅ PR creation allowed
 
@@ -161,7 +161,7 @@ git push origin test/github-actions-setup
 ```
 
 ### Create Pull Request
-Go to: https://github.com/mithunselvan/dokuwiki/pulls
+Go to: https://github.com/mithun3/dokuwiki/pulls
 - Click "New Pull Request"
 - Compare: `main` ← `test/github-actions-setup`
 - Click "Create Pull Request"
@@ -169,7 +169,7 @@ Go to: https://github.com/mithunselvan/dokuwiki/pulls
 - Click "Create Pull Request"
 
 ### Watch Workflow Run
-Go to: https://github.com/mithunselvan/dokuwiki/actions
+Go to: https://github.com/mithun3/dokuwiki/actions
 
 **Expected Steps:**
 1. "Test" workflow starts immediately (on any branch)
@@ -198,7 +198,7 @@ Once preview deployment works:
 3. Confirm merge to main
 
 ### Watch Production Deployment
-Go to: https://github.com/mithunselvan/dokuwiki/actions
+Go to: https://github.com/mithun3/dokuwiki/actions
 - "Deploy to Vercel" workflow runs again with main branch
 - watch for deploy-production job
 - Should complete in ~2-3 minutes
@@ -300,8 +300,8 @@ After successful test deployment:
 
 | Name | URL | Purpose |
 |------|-----|---------|
-| GitHub Actions | https://github.com/mithunselvan/dokuwiki/actions | Monitor workflow runs |
-| GitHub Secrets | https://github.com/mithunselvan/dokuwiki/settings/secrets/actions | Manage credentials |
+| GitHub Actions | https://github.com/mithun3/dokuwiki/actions | Monitor workflow runs |
+| GitHub Secrets | https://github.com/mithun3/dokuwiki/settings/secrets/actions | Manage credentials |
 | Vercel Dashboard | https://vercel.com/dashboard/projects/nextjs-wiki | Monitor deployments |
 | Vercel Tokens | https://vercel.com/account/tokens | Manage auth tokens |
 | Production | https://sysya.com.au | Verify live site |
