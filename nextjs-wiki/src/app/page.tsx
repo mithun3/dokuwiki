@@ -31,7 +31,14 @@ export default function HomePage() {
         </Link>
       </div>
 
-      <section className="mt-12 p-6 bg-blue-50 rounded-lg">
+      <section className="mt-12 p-6 bg-amber-50 rounded-lg border border-amber-200">
+        <h3 className="text-lg font-semibold mb-3 text-amber-900">About Me</h3>
+        <p className="text-gray-700 leading-relaxed">
+          By day, I navigate the corporate world. By night, I'm a freelance audio consultant—specializing in recording, sound design, and field audio work. Whether it's remote capture, on-location spot recording, or immersive ambient soundscaping, I bring studio-grade discipline and creative insight to every project. This library reflects multiple decades of field expertise, gear knowledge, and the sonic techniques that separate good recordings from exceptional ones.
+        </p>
+      </section>
+
+      <section className="mt-8 p-6 bg-blue-50 rounded-lg">
         <h3 className="text-lg font-semibold mb-2">About This Wiki</h3>
         <p className="text-gray-700">
           This wiki documents field recording techniques, equipment, and sound libraries 
