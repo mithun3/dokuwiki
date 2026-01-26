@@ -8,9 +8,9 @@ export default function Comments() {
     const script = document.createElement('script');
     script.src = 'https://giscus.app/client.js';
     script.dataset.repo = 'mithun3/dokuwiki';
-    script.dataset.repoId = 'R_kgDOH1F4rQ'; // You'll need to update this with actual repo ID
+    script.dataset.repoId = 'R_kgDOQ6N5_A'; // You'll need to update this with actual repo ID
     script.dataset.category = 'Comments';
-    script.dataset.categoryId = 'DIC_kwDOH1F4rc4CfQ1l'; // You'll need to update this with actual category ID
+    script.dataset.categoryId = 'DIC_kwDOQ6N5_M4C1ciQ'; // You'll need to update this with actual category ID
     script.dataset.mapping = 'pathname';
     script.dataset.term = '';
     script.dataset.reactionsEnabled = '1';
@@ -32,7 +32,7 @@ export default function Comments() {
     <div className="mt-12 border-t border-gray-200 pt-8">
       <h2 className="mb-6 text-2xl font-bold">💬 Comments & Discussion</h2>
       <p className="mb-6 text-gray-600">
-        Have thoughts or questions about this page? Share them below! Comments are powered by GitHub Discussions.
+        Have thoughts or questions? Share them below!
       </p>
       <div
         id="giscus"
