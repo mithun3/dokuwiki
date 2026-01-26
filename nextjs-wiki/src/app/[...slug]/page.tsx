@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import remarkGfm from 'remark-gfm';
 import { MediaGallery } from '@/components/MediaPlayer/MediaGallery';
 import Comments from '@/components/Comments';
+import ArticleFooter from '@/components/ArticleFooter';
 
 const mdxComponents = {
   MediaGallery,
@@ -50,6 +51,7 @@ export default function ContentPage({ params }: { params: { slug: string[] } }) 
           },
         }}
       />
+      <ArticleFooter metadata={content.meta} />
       <Comments />
     </article>
   );
