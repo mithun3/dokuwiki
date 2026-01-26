@@ -4,13 +4,13 @@ import { useEffect } from 'react';
 
 export default function Comments() {
   useEffect(() => {
-    // Load Giscus script
+    // Load Giscus script with environment variables
     const script = document.createElement('script');
     script.src = 'https://giscus.app/client.js';
     script.dataset.repo = 'mithun3/dokuwiki';
-    script.dataset.repoId = 'R_kgDOQ6N5_A'; // You'll need to update this with actual repo ID
+    script.dataset.repoId = process.env.NEXT_PUBLIC_GISCUS_REPO_ID || '';
     script.dataset.category = 'Comments';
-    script.dataset.categoryId = 'DIC_kwDOQ6N5_M4C1ciQ'; // You'll need to update this with actual category ID
+    script.dataset.categoryId = process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID || '';
     script.dataset.mapping = 'pathname';
     script.dataset.term = '';
     script.dataset.reactionsEnabled = '1';
