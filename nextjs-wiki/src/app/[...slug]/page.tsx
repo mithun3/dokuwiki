@@ -3,6 +3,7 @@ import { getContentBySlug, getAllContentSlugs } from '@/lib/content';
 import { notFound } from 'next/navigation';
 import remarkGfm from 'remark-gfm';
 import { MediaGallery } from '@/components/MediaPlayer/MediaGallery';
+import Comments from '@/components/Comments';
 
 const mdxComponents = {
   MediaGallery,
@@ -49,6 +50,7 @@ export default function ContentPage({ params }: { params: { slug: string[] } }) 
           },
         }}
       />
+      <Comments />
     </article>
   );
 }
