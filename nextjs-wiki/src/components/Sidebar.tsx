@@ -32,17 +32,19 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [skipAutoExpand, setSkipAutoExpand] = useState(true);
 
   // Load expanded state from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('sidebar-expanded');
     setExpandedItems(saved ? JSON.parse(saved) : []);
     setIsLoaded(true);
+    setSkipAutoExpand(false);
   }, []);
 
-  // Auto-expand parent if viewing a child page
+  // Auto-expand parent if viewing a child page (only after initial load)
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded || skipAutoExpand) return;
     
     navigationItems.forEach((item) => {
       if (item.children) {
@@ -58,7 +60,7 @@ export default function Sidebar() {
         }
       }
     });
-  }, [pathname, isLoaded]);
+  }, [pathname, isLoaded, expandedItems, skipAutoExpand]);
 
   // Save expanded state to localStorage
   const toggleExpanded = (href: string) => {
