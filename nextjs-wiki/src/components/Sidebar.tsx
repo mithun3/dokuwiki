@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 const navigationItems = [
   { href: '/', label: 'Home' },
@@ -29,11 +30,47 @@ const navigationItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  // Load expanded state from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebar-expanded');
+    if (saved) {
+      setExpandedItems(JSON.parse(saved));
+    }
+  }, []);
+
+  // Auto-expand parent if viewing a child page
+  useEffect(() => {
+    navigationItems.forEach((item) => {
+      if (item.children) {
+        const isViewingChild = item.children.some(
+          (child) => pathname === child.href
+        );
+        if (isViewingChild && !expandedItems.includes(item.href)) {
+          setExpandedItems((prev) => [...prev, item.href]);
+        }
+      }
+    });
+  }, [pathname]);
+
+  // Save expanded state to localStorage
+  const toggleExpanded = (href: string) => {
+    setExpandedItems((prev) => {
+      const updated = prev.includes(href)
+        ? prev.filter((item) => item !== href)
+        : [...prev, href];
+      localStorage.setItem('sidebar-expanded', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href);
   };
+
+  const isExpanded = (href: string) => expandedItems.includes(href);
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 overflow-y-auto">
@@ -49,18 +86,34 @@ export default function Sidebar() {
           <ul className="space-y-1">
             {navigationItems.map((item) => (
               <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`block px-3 py-2 rounded-md text-sm font-medium transition ${
-                    isActive(item.href)
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  {item.label}
-                </Link>
+                <div className="flex items-center">
+                  <Link
+                    href={item.href}
+                    className={`flex-1 block px-3 py-2 rounded-md text-sm font-medium transition ${
+                      isActive(item.href)
+                        ? 'bg-blue-50 text-blue-700'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
 
-                {item.children && (
+                  {item.children && (
+                    <button
+                      onClick={() => toggleExpanded(item.href)}
+                      className="px-2 py-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                      aria-label={
+                        isExpanded(item.href) ? 'Collapse' : 'Expand'
+                      }
+                    >
+                      <span className="inline-block transition-transform">
+                        {isExpanded(item.href) ? '▼' : '▶'}
+                      </span>
+                    </button>
+                  )}
+                </div>
+
+                {item.children && isExpanded(item.href) && (
                   <ul className="ml-4 mt-1 space-y-1">
                     {item.children.map((child) => (
                       <li key={child.href}>
@@ -68,7 +121,7 @@ export default function Sidebar() {
                           href={child.href}
                           className={`block px-3 py-2 rounded-md text-sm transition ${
                             pathname === child.href
-                              ? 'bg-blue-50 text-blue-600'
+                              ? 'bg-blue-50 text-blue-600 font-medium'
                               : 'text-gray-600 hover:bg-gray-50'
                           }`}
                         >
