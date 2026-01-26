@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { usePathname } from 'next/navigation';
 
 interface ArticleMetadata {
@@ -44,19 +44,10 @@ function formatDate(dateString: string): string {
 }
 
 export default function ArticleFooter({ metadata }: { metadata: ArticleMetadata }) {
-  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { evolutionPhase, lastReviewedAt, status } = metadata;
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted || (!evolutionPhase && !lastReviewedAt && !status)) {
+  if (!evolutionPhase && !lastReviewedAt && !status) {
     return null;
   }
 
