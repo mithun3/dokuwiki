@@ -1,17 +1,79 @@
-# DokuWiki AWS + Local Scaffold
+# DokuWiki Migration: AWS → Vercel Serverless
 
-This repository seeds infrastructure, application image, and content-as-code for DokuWiki.
+**Status:** ✅ **PRODUCTION** - Migration Complete (27 Jan 2026)
 
-- `infra/`: Terraform skeleton (AWS provider, tagging, backend placeholders). Add modules for VPC, ALB/WAF, EFS, compute (ECS/EC2), Route53, ACM, backups.
-- `app/`: Dockerfile with nginx + php-fpm + DokuWiki (stable tarball), supervisor, nginx/php configs, and volume mounts for persistence.
-- `content/pages/`: DokuWiki-native `.txt` files (git-tracked source of truth for pages).
-- `docker-compose.yml`: local runner exposing http://localhost:8080; volumes keep data/config/plugins persistent on your machine. Use `ADMIN_PASSWORD=changeme DEMO_USERS=1` for seeded users; set `S3_BACKUP_BUCKET` (+ optional `S3_BACKUP_PREFIX`, `S3_BACKUP_ON_START=1`) to snapshot state to S3 at startup; set `S3_BACKUP_CRON` for recurring uploads. Nginx is configured for DokuWiki pretty URLs.
+**Current Platform:** Next.js on Vercel (Serverless)  
+**Previous Platform:** DokuWiki on AWS ECS Fargate (✅ Decommissioned)  
+**Live Site:** https://sysya.com.au
 
 ---
 
-## 🚨 CRITICAL: Domain Nameserver Configuration
+## 🚀 Project Overview
 
-When deploying to AWS with a custom domain, you **MUST** configure your domain's nameservers at your registrar. Without this step, SSL certificate validation will hang indefinitely.
+This repository contains a wiki application that has been successfully migrated from a traditional AWS infrastructure to a modern serverless architecture on Vercel.
+
+**Current Stack:**
+- **Framework:** Next.js 14 (React + TypeScript)
+- **Hosting:** Vercel (serverless, auto-scaling, zero-ops)
+- **Content:** MDX with metadata + dynamic routing
+- **Media Storage:** S3 bucket + CloudFront CDN
+- **CI/CD:** GitHub Actions (auto-deploy on git push)
+- **Versioning:** Semantic versioning with automated releases
+
+**Cost Optimization:**
+- **Before:** $140-170/month (AWS infrastructure)
+- **After:** $2-7/month (Vercel + S3 + CloudFront)
+- **Savings:** $1,620-1,980/year 💰
+
+---
+
+## 📂 Directory Structure
+
+**Active Directories:**
+- `nextjs-wiki/`: Next.js production application
+  - `src/app/`: Page routes and API handlers
+  - `src/components/`: Reusable React components
+  - `content/`: MDX articles with frontmatter metadata
+  - `public/`: Static assets
+- `docs/`: Comprehensive project documentation
+- `.github/workflows/`: GitHub Actions automation (deploy, test, release)
+
+**Archived Directories (Historical Reference):**
+- `infra/`: Terraform IaC for AWS (AWS decommissioned Jan 27, 2026)
+- `app/`: Docker image for DokuWiki on ECS (archived)
+- `scripts/`: Deployment and setup scripts (historical)
+- `content/`: Legacy content source (pages migrate to nextjs-wiki/content/)
+
+---
+
+## ✅ Migration Status
+
+| Phase | Task | Status | Completed |
+|-------|------|--------|-----------|
+| 1 | Next.js app built with full content | ✅ | Jan 20 |
+| 2 | Deployed to Vercel (production-ready) | ✅ | Jan 22 |
+| 3 | GitHub Actions CI/CD configured | ✅ | Jan 24 |
+| 4 | Semantic versioning implemented | ✅ | Jan 26 |
+| 5 | AWS infrastructure decommissioned | ✅ | Jan 27 |
+
+---
+
+## 📚 Documentation
+
+All project documentation is organized in the `/docs/` directory:
+
+- **[docs/README.md](docs/README.md)** - Documentation index and quick links
+- **[docs/QUICK-START.md](docs/QUICK-START.md)** - Getting started guide
+- **[docs/CHANGELOG.md](docs/CHANGELOG.md)** - Complete release history
+- **[docs/PROJECT-STATUS.md](docs/PROJECT-STATUS.md)** - Current development status
+- **[docs/GITHUB-ACTIONS-QUICK-START.md](docs/GITHUB-ACTIONS-QUICK-START.md)** - Automated releases guide
+
+---
+
+## 🚨 ARCHIVED: Critical Domain Nameserver Configuration
+
+> **⚠️ ARCHIVED:** This section applies only to AWS deployments. The project now uses Vercel DNS management. Retained for historical/recovery reference only.
+>
 
 ### Why This Is Required
 
@@ -148,9 +210,122 @@ Once DNS propagates, AWS ACM will automatically validate your certificate. The T
 
 ---
 
-## Development & Deployment
+## 🛠️ Development
 
-### Local Development (localhost)
+### Local Setup
+
+```bash
+cd nextjs-wiki
+npm install
+npm run dev
+```
+
+Visit http://localhost:3000 to preview your changes.
+
+### Building & Testing
+
+```bash
+# Run tests
+npm run test
+
+# Build for production
+npm run build
+
+# Start production server
+npm run start
+```
+
+### Creating Content
+
+Add new articles as MDX files in `nextjs-wiki/content/`:
+
+```markdown
+---
+title: "Article Title"
+description: "Brief description"
+date: "2026-01-27"
+evolutionPhase: "foundational"
+lastReviewedAt: "2026-01-27"
+---
+
+# Article Title
+
+Content here with Markdown formatting...
+```
+
+---
+
+## 🚀 Deployment
+
+### Automatic (Recommended)
+Push to `migrate` branch → GitHub Actions automatically deploys to Vercel
+
+### Manual Deployment
+```bash
+cd nextjs-wiki
+npm run build
+vercel deploy --prod
+```
+
+---
+
+## 🔄 Versioning & Releases
+
+This project uses semantic versioning (MAJOR.MINOR.PATCH).
+
+### Create a Release
+
+Go to GitHub → Actions → "Create Release" workflow:
+
+1. Click "Run workflow"
+2. Enter version (e.g., `1.3.0`)
+3. Choose branch (`migrate` or `main`)
+4. Add changelog entry
+5. Click "Run"
+
+Release is created in ~30 seconds with:
+- ✅ Git tag (v1.3.0)
+- ✅ Updated CHANGELOG.md
+- ✅ Updated package.json
+- ✅ GitHub release page
+
+See [docs/GITHUB-ACTIONS-QUICK-START.md](docs/GITHUB-ACTIONS-QUICK-START.md) for detailed guide.
+
+---
+
+## 📊 Project Stats
+
+- **Total Pages:** 22 articles
+- **Build Time:** ~1 minute
+- **Test Suite:** 38/38 passing ✅
+- **Performance:** Optimized for Vercel Edge Network
+- **Uptime:** 99.9% (Vercel SLA)
+
+---
+
+## 🎯 Key Features
+
+✅ **Fast Loading:** Global CDN, optimized images, code splitting  
+✅ **Reliable:** Serverless auto-scaling, zero infrastructure management  
+✅ **Modern:** React components, TypeScript, tailored CSS  
+✅ **Automated:** GitHub Actions CI/CD, semantic versioning  
+✅ **Maintainable:** Clean code structure, comprehensive docs  
+✅ **Cost-Effective:** $1,620-1,980 annual savings  
+
+---
+
+## 📞 Support
+
+- **Documentation:** See [docs/README.md](docs/README.md)
+- **Issues:** Check [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+- **Status:** See [docs/PROJECT-STATUS.md](docs/PROJECT-STATUS.md)
+
+---
+
+## 📜 ARCHIVED: AWS Infrastructure (Historical Reference)
+
+> **Note:** AWS infrastructure was successfully decommissioned on January 27, 2026. The following sections are retained for historical reference and disaster recovery only.
+>
 
 Run DokuWiki locally for development and testing:
 
