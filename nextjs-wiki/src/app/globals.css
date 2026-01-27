@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --player-height: 80px;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .wiki-content {
+    @apply prose prose-slate max-w-none;
+  }
+  
+  .wiki-content h1 {
+    @apply text-3xl font-bold mt-8 mb-4;
+  }
+  
+  .wiki-content h2 {
+    @apply text-2xl font-bold mt-6 mb-3;
+  }
+  
+  .wiki-content h3 {
+    @apply text-xl font-semibold mt-4 mb-2;
+  }
+  
+  .wiki-content a {
+    @apply text-blue-600 hover:text-blue-800 underline;
+  }
+  
+  .wiki-content code {
+    @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm;
+  }
+  
+  .wiki-content pre {
+    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto;
+  }
+  
+  .wiki-content ul, .wiki-content ol {
+    @apply my-4 ml-6;
+  }
+  
+  .wiki-content li {
+    @apply mb-2;
+  }
+}
+
+/* Media Player Styles */
+.media-player {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 480px;
+  max-width: calc(100vw - 40px);
+  z-index: 50;
+  transform: translateX(120%);
+  transition: transform 0.3s ease-in-out;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.media-player.visible {
+  transform: translateX(0);
+}
+
+.media-player-mini {
+  width: 320px;
+}
+
+/* Content padding when player is visible */
+body.player-active {
+  padding-bottom: var(--player-height);
+}
+
+/* Progress bar */
+.progress-bar {
+  @apply relative h-1 bg-gray-300 rounded-full cursor-pointer;
+}
+
+.progress-bar .progress-fill {
+  @apply absolute top-0 left-0 h-full bg-blue-600 rounded-full transition-all;
+}
+
+.progress-bar:hover .progress-fill {
+  @apply bg-blue-700;
+}
+
+/* Volume slider */
+.volume-slider {
+  @apply w-20 h-1 bg-gray-300 rounded-full cursor-pointer;
+}
+
+.volume-slider .volume-fill {
+  @apply absolute top-0 left-0 h-full bg-blue-600 rounded-full;
+}

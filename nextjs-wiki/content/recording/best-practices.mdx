@@ -1,0 +1,335 @@
+---
+title: "Recording Best Practices"
+description: "Industry standards and professional workflows"
+evolutionPhase: "refined"
+lastReviewedAt: "2026-01-27"
+status: "active"
+---
+
+# 📋 Recording Best Practices
+
+Professional field recording requires more than just equipment. Success comes from preparation, discipline, and adherence to proven industry standards. This guide covers the essential practices that separate quality recordings from mediocre ones.
+
+## 🎯 Pre-Session Preparation
+
+Before every recording session, follow this verification checklist:
+
+### Equipment Verification
+- **Battery Management**
+  - Fully charge all batteries the night before
+  - Carry spare batteries (at least 2x expected session duration)
+  - Test battery contacts for corrosion
+  - Avoid battery changes mid-session when possible
+
+- **Media & Storage**
+  - Format all storage media in the recording device (not on computer)
+  - Verify remaining capacity: minimum 20% headroom
+  - Check for bad sectors before critical sessions
+  - Maintain separate media for backup
+
+- **Cable Integrity**
+  - Test all connections with XLR continuity tester
+  - Visual inspection for damage, kinks, or fraying
+  - Clean connectors with compressed air or contact cleaner
+  - Store cables in cable bag to prevent damage
+
+- **Firmware & Software**
+  - Check for device firmware updates (not the day of critical recording)
+  - Update to latest stable drivers if working with new systems
+  - Test new software in controlled environment first
+
+### Site Survey
+- Scout location before session when possible
+- Identify potential noise sources (HVAC, traffic, utilities)
+- Test ambient levels at different times of day
+- Note equipment placement constraints
+- Plan backup locations for problematic audio
+
+---
+
+## 📊 Gain Structure & Levels
+
+Proper gain staging prevents clipping and maintains headroom for post-processing.
+
+### Level Targets
+
+**For 24-bit Recording (Most Common):**
+- RMS levels: **-18dBFS to -12dBFS**
+- Peak transients: **-6dBFS** (never above 0dBFS)
+- Comfortable headroom for unexpected peaks
+
+**For 32-bit Float Recording (Pro Systems):**
+- More forgiving due to floating-point range
+- Maintain reasonable levels: -24dBFS to -6dBFS
+- Take advantage of clipping protection
+- Still avoid extreme levels for best dynamic range
+
+**For Analog Recording or Line Inputs:**
+- VU meter target: **-6VU to -3VU** (0VU = +4dBu)
+- Peak indicator: occasional hits to 0VU acceptable
+- Avoid consistent levels in red zone
+
+### Gain Staging Steps
+
+1. **Set Input Gain**: 6-12dB before peak expected levels
+2. **Source Test**: Generate typical sounds at session level
+3. **Monitor Output**: Watch meters for sustained -18dBFS to -12dBFS
+4. **Build Margin**: Leave 6dB peak headroom minimum
+5. **Document**: Note gain settings for consistency
+
+---
+
+## 💾 Backup Strategy: The 3-2-1 Rule
+
+Data loss is not a question of "if" but "when." Never rely on a single copy.
+
+### The Standard
+- **3 copies** of critical recordings
+- **2 different storage media types** (e.g., SSD + magnetic drive)
+- **1 off-site backup** (geographic separation)
+
+### Implementation Example
+- **Copy 1**: Primary recording media (SD card, SSD)
+- **Copy 2**: Secondary media (different type, different device)
+- **Copy 3**: Off-site backup (cloud, external HD at different location)
+
+### Timing
+- Backup immediately after session
+- Verify file integrity (checksums, file size)
+- Maintain sequential backup schedule
+- Test recovery procedure quarterly
+
+---
+
+## 🎧 Monitoring Standards
+
+Professional monitoring prevents costly errors in the field.
+
+### Headphone Calibration
+- Establish baseline with **85dB SPL** at ear
+- Use **-20dBFS pink noise** as reference signal
+- Measure at ear position with sound level meter
+- Account for ambient noise floor
+- Re-calibrate monthly or after equipment changes
+
+### Headphone Selection
+- **Closed-back design**: Isolation in noisy environments
+- **Flat frequency response**: 50Hz-20kHz minimum
+- **Comfortable fit**: Hours of wear without fatigue
+- **Cable**: Reinforced, tested regularly
+
+### Monitoring Practice
+- **Continuous monitoring**: Listen throughout session
+- **Reference mix**: Compare to known good reference track
+- **Break intervals**: Remove headphones every 30 minutes
+- **Fatigue awareness**: Tired ears make poor decisions
+
+---
+
+## 📝 Recording Environment Setup
+
+### Microphone Placement
+
+**Microphone Distance**
+- Maintain 6-12 inches from primary source
+- Account for proximity effect with cardioid mics
+- Move further for very loud sources (drums, cymbals)
+- Test distances during rehearsal/prep
+
+**Directional Considerations**
+- Position microphone perpendicular to unwanted noise
+- Use microphone off-axis rejection to minimize reflections
+- Avoid pointing at hard reflective surfaces
+- Account for wind and handling noise
+
+**Stand & Shock Mount**
+- Use shock mount for hand-held or hanging mics
+- Elevate stand away from vibration sources
+- Isolate from floor/structure vibrations
+- Prevent cable noise through proper routing
+
+### Environmental Acoustics
+
+**Room Assessment**
+- Hard surfaces create reflection and reverb
+- Soft materials absorb sound and reduce reflections
+- Mid-size rooms often provide best balance
+- Avoid rooms with strong standing waves
+
+**Noise Floor**
+- Target ambient: -60dBFS or lower
+- Identify and eliminate/avoid noise sources
+- Use portable acoustic treatment if available
+- Plan session timing around quiet periods
+
+---
+
+## 📄 Metadata & File Naming
+
+Consistency in documentation prevents confusion and lost information.
+
+### File Naming Convention
+```
+YYYYMMDD_ProjectCode_TakeNumber_Brief Description.wav
+Example: 20260127_PROJ001_T01_urban-street-ambience-morning.wav
+```
+
+**Components:**
+- **Date**: YYYYMMDD format (sortable, unambiguous)
+- **Project Code**: Short identifier (3-4 characters)
+- **Take Number**: T01, T02, etc. (logical sequence)
+- **Description**: Key details about content (30 chars max)
+
+### Sound Report Documentation
+
+Create a sound report for every session:
+
+**Required Information:**
+- Session date and location
+- Microphone model and placement
+- Gain settings and peak levels
+- Duration and total recording time
+- Issues encountered (noise, equipment problems)
+- Notes on quality and usability
+
+**Digital Format**
+- CSV or JSON for automated cataloging
+- Timestamp recordings were captured
+- Equipment serial numbers (for maintenance tracking)
+- Backup schedule completed
+- Hash/checksum for integrity verification
+
+---
+
+## 🔄 Post-Recording Workflow
+
+### Immediate Actions
+1. **Verify Recording**: Spot-check random sections
+2. **Log Metadata**: Complete sound report while fresh
+3. **Backup**: Execute 3-2-1 backup strategy
+4. **Label Media**: Mark original media with session info
+5. **Cool Down**: Let gear settle before packing
+
+### Quality Assurance
+- Check for clipping (0dBFS hits)
+- Verify no dropout or corruption
+- Listen for unexpected noise
+- Compare to monitoring experience
+- Document any issues for future reference
+
+### Long-term Storage
+- Archive original media separately
+- Migrate from aging storage types (optical, tape)
+- Test backups annually
+- Maintain comprehensive metadata
+- Plan for technology obsolescence (format changes)
+
+---
+
+## ⚠️ Common Mistakes to Avoid
+
+<table>
+  <thead>
+    <tr>
+      <th>Mistake</th>
+      <th>Impact</th>
+      <th>Prevention</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Single backup</td>
+      <td>Total loss on failure</td>
+      <td>Implement 3-2-1 rule immediately</td>
+    </tr>
+    <tr>
+      <td>Levels too hot</td>
+      <td>Clipping, distortion</td>
+      <td>Monitor during prep, leave headroom</td>
+    </tr>
+    <tr>
+      <td>Untested gear</td>
+      <td>Failed session</td>
+      <td>Test entire chain before critical work</td>
+    </tr>
+    <tr>
+      <td>Poor cable care</td>
+      <td>Intermittent failures</td>
+      <td>Use surge protector, store properly</td>
+    </tr>
+    <tr>
+      <td>No monitoring</td>
+      <td>Discover problems in edit</td>
+      <td>Listen throughout entire session</td>
+    </tr>
+    <tr>
+      <td>Inconsistent naming</td>
+      <td>Lost files, confusion</td>
+      <td>Use standardized naming convention</td>
+    </tr>
+    <tr>
+      <td>Headphone fatigue</td>
+      <td>Poor monitoring decisions</td>
+      <td>Use calibrated monitors, take breaks</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 🎓 Professional Standards Summary
+
+<table>
+  <thead>
+    <tr>
+      <th>Standard</th>
+      <th>Specification</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Sample Rate</strong></td>
+      <td>44.1 kHz (CD), 48 kHz (video/film), 96 kHz (archival)</td>
+    </tr>
+    <tr>
+      <td><strong>Bit Depth</strong></td>
+      <td>24-bit (professional standard), 32-bit float (optional headroom)</td>
+    </tr>
+    <tr>
+      <td><strong>Frequency Response</strong></td>
+      <td>20Hz-20kHz minimum (human hearing range)</td>
+    </tr>
+    <tr>
+      <td><strong>Headroom</strong></td>
+      <td>6dB minimum (prevent clipping)</td>
+    </tr>
+    <tr>
+      <td><strong>Monitoring Calibration</strong></td>
+      <td>85dB SPL (reference level)</td>
+    </tr>
+    <tr>
+      <td><strong>Backup Redundancy</strong></td>
+      <td>3-2-1 rule (3 copies, 2 media types, 1 offsite)</td>
+    </tr>
+    <tr>
+      <td><strong>File Format</strong></td>
+      <td>WAV (uncompressed), AIFF (Mac compatibility), or lossless</td>
+    </tr>
+    <tr>
+      <td><strong>Documentation</strong></td>
+      <td>Sound report for every session</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 📚 Related Topics
+
+- [Recording Techniques](/recording/techniques) - Microphone configurations and stereo recording
+- [Equipment Guide](/recording/equipment-guide) - Choosing and maintaining recording gear
+- [My Equipment](/recording/my-equipment) - Personal setup and recommendations
+
+---
+
+*Last reviewed: January 2026 | Status: Active | Phase: Refined*

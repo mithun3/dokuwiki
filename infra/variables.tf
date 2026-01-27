@@ -93,3 +93,9 @@ variable "media_bucket_name" {
   type        = string
   default     = ""
 }
+
+variable "enable_vercel_dns" {
+  description = "Enable Vercel DNS configuration (for Next.js migration). Set to false to keep ECS/ALB DNS records."
+  type        = bool
+  default     = false
+}

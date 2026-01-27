@@ -3,6 +3,9 @@
 .terraform/
 tfplan.out
 
+# Decommissioning logs (runtime generated)
+scripts/decommissioning/logs/
+
 # DokuWiki runtime/cache files (regenerated at startup)
 app/seed/data/cache/
 app/seed/data/index/

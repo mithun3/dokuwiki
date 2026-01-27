@@ -9,7 +9,7 @@ Explore our comprehensive recording resources:
   * *[[techniques|Recording Techniques]]* - Microphone placement, stereo techniques (X/Y, ORTF, M/S, Blumlein), room acoustics, and digital recording considerations
   * *[[best-practices|Best Practices]]* - Industry standards for gain staging, file management, backup strategies, monitoring, and quality control
   * *[[equipment-guide|Equipment Guide]]* - Definitive guide to portable recorders, studio interfaces, and live recording gear
-  * *[[my-equipment|My Equipment]]* - Personal rig documentation including MixPre-10 II, RME Fireface UFX+, Orion 32+, and microphone collection
+  * *[[equipment|Equipment]]* - Personal rig documentation including MixPre-10 II, RME Fireface UFX+, Orion 32+, and microphone collection
 
 ===== Quick Checklist =====
 

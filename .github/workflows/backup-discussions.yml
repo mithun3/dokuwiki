@@ -1,0 +1,88 @@
+name: Weekly Backup of GitHub Discussions
+
+on:
+  schedule:
+    # Run every Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+jobs:
+  backup-discussions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      discussions: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create backup directory
+        run: mkdir -p backups/discussions
+
+      - name: Query GitHub Discussions API
+        id: query
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          BACKUP_FILE="backups/discussions/discussions-${TIMESTAMP}.json"
+          
+          # GraphQL query to fetch all discussions with comments
+          QUERY='query {
+            repository(owner: "mithun3", name: "dokuwiki") {
+              discussions(first: 100) {
+                nodes {
+                  id
+                  title
+                  body
+                  createdAt
+                  updatedAt
+                  author {
+                    login
+                  }
+                  category {
+                    name
+                  }
+                  comments(first: 50) {
+                    nodes {
+                      id
+                      body
+                      createdAt
+                      updatedAt
+                      author {
+                        login
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }'
+          
+          gh api graphql -f query="$QUERY" > "$BACKUP_FILE"
+          echo "backup_file=$BACKUP_FILE" >> $GITHUB_OUTPUT
+          echo "✅ Backup created: $BACKUP_FILE"
+
+      - name: Display backup summary
+        run: |
+          BACKUP_FILE=${{ steps.query.outputs.backup_file }}
+          echo "File size: $(du -h "$BACKUP_FILE" | cut -f1)"
+          echo "Number of discussions: $(jq '.data.repository.discussions.nodes | length' "$BACKUP_FILE")"
+
+      - name: Commit and push backup
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add backups/discussions/
+          git commit -m "backup: weekly discussions export $(date +%Y-%m-%d)" || echo "No changes to commit"
+          git push
+
+      - name: Create issue if backup fails
+        if: failure()
+        uses: actions/create-issue@v2
+        with:
+          title: "⚠️ Discussions backup failed"
+          body: |
+            The weekly backup of GitHub Discussions failed.
+            Please check the workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

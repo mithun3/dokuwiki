@@ -1,0 +1,14 @@
+{
+  "timestamp": null,
+  "region": null,
+  "resources": {
+    "ecs": {},
+    "rds": {},
+    "efs": {},
+    "elb": {},
+    "nat": {},
+    "ecr": {},
+    "vpc": {},
+    "security_groups": {}
+  }
+}
