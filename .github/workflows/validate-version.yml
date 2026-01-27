@@ -1,0 +1,66 @@
+name: Validate Version
+
+on:
+  pull_request:
+    paths:
+      - 'CHANGELOG.md'
+      - 'nextjs-wiki/package.json'
+
+jobs:
+  validate-version:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Get Versions
+        id: versions
+        run: |
+          PACKAGE_VERSION=$(jq -r '.version' nextjs-wiki/package.json)
+          CHANGELOG_VERSION=$(head -n 3 CHANGELOG.md | grep -oP '\[\K[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+          
+          echo "package_version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+          echo "changelog_version=$CHANGELOG_VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Check Versions Match
+        run: |
+          PACKAGE_VERSION="${{ steps.versions.outputs.package_version }}"
+          CHANGELOG_VERSION="${{ steps.versions.outputs.changelog_version }}"
+          
+          echo "📦 Package.json version: $PACKAGE_VERSION"
+          echo "📝 CHANGELOG.md version: $CHANGELOG_VERSION"
+          
+          if [ "$PACKAGE_VERSION" != "$CHANGELOG_VERSION" ]; then
+            echo "❌ Version mismatch!"
+            echo ""
+            echo "Ensure:"
+            echo "  1. package.json and CHANGELOG.md have same version"
+            echo "  2. CHANGELOG.md has entry at top: ## [$VERSION] - YYYY-MM-DD"
+            exit 1
+          fi
+          
+          echo "✅ Versions match!"
+      
+      - name: Validate Semantic Versioning
+        run: |
+          VERSION="${{ steps.versions.outputs.package_version }}"
+          
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Invalid version format: $VERSION"
+            echo "Use Semantic Versioning: MAJOR.MINOR.PATCH (e.g., 1.3.0)"
+            exit 1
+          fi
+          
+          echo "✅ Valid semantic version: $VERSION"
+      
+      - name: Check CHANGELOG Format
+        run: |
+          if ! head -n 3 CHANGELOG.md | grep -q "^## \[[0-9]\+\.[0-9]\+\.[0-9]\+\]"; then
+            echo "❌ Invalid CHANGELOG format"
+            echo ""
+            echo "First line should be: ## [X.Y.Z] - YYYY-MM-DD"
+            echo "Example: ## [1.3.0] - 2026-02-15"
+            exit 1
+          fi
+          
+          echo "✅ CHANGELOG format valid"
