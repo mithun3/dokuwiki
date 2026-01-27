@@ -3,6 +3,16 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 
+/**
+ * Metadata about an article extracted from MDX frontmatter
+ * Used to display article lifecycle stage and review status
+ * 
+ * @interface ArticleMetadata
+ * @property {string} title - Article title
+ * @property {'foundational'|'refined'|'experimental'|'archived'} [evolutionPhase] - Content maturity stage
+ * @property {string} [lastReviewedAt] - ISO date when content was last reviewed
+ * @property {'active'|'draft'|'deprecated'} [status] - Publication status
+ */
 interface ArticleMetadata {
   title: string;
   evolutionPhase?: 'foundational' | 'refined' | 'experimental' | 'archived';
@@ -10,6 +20,7 @@ interface ArticleMetadata {
   status?: 'active' | 'draft' | 'deprecated';
 }
 
+/** Color schemes for evolution phase badges */
 const phaseColors = {
   foundational: 'bg-blue-100 text-blue-800 border border-blue-300',
   refined: 'bg-green-100 text-green-800 border border-green-300',
@@ -17,12 +28,14 @@ const phaseColors = {
   archived: 'bg-gray-100 text-gray-800 border border-gray-300',
 };
 
+/** Color schemes for status indicators */
 const statusColors = {
   active: 'text-green-700',
   draft: 'text-yellow-700',
   deprecated: 'text-red-700',
 };
 
+/** User-friendly descriptions for each evolution phase */
 const phaseDescriptions = {
   foundational: 'Foundational — Core concepts and essential knowledge',
   refined: 'Refined — Well-developed with practical experience',
@@ -30,6 +43,11 @@ const phaseDescriptions = {
   archived: 'Archived — Historical reference only',
 };
 
+/**
+ * Formats ISO date string to readable date
+ * @param {string} dateString - ISO format date (e.g., "2026-01-27")
+ * @returns {string} Formatted date (e.g., "Jan 27, 2026")
+ */
 function formatDate(dateString: string): string {
   try {
     const date = new Date(dateString);

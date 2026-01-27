@@ -4,6 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
+/**
+ * Main navigation structure for the wiki
+ * Includes expandable sections with nested links
+ * Stored in state to allow client-side modifications
+ */
 const navigationItems = [
   { href: '/', label: 'Home' },
   {
@@ -28,6 +33,19 @@ const navigationItems = [
   { href: '/faq', label: 'FAQ' },
 ];
 
+/**
+ * Navigation sidebar component
+ * 
+ * Features:
+ * - Expandable sections for nested navigation
+ * - Active link highlighting based on current pathname
+ * - Auto-expand parent when viewing child page
+ * - Persistent expansion state (localStorage)
+ * - Responsive toggle for mobile
+ * 
+ * @component
+ * @returns {JSX.Element} Vertical navigation sidebar
+ */
 export default function Sidebar() {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);

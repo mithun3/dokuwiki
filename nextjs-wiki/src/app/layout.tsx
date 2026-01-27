@@ -4,6 +4,7 @@ import './globals.css';
 import { MediaPlayerProvider } from '@/components/MediaPlayer/MediaPlayerProvider';
 import MediaPlayer from '@/components/MediaPlayer/MediaPlayer';
 import Sidebar from '@/components/Sidebar';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,17 +22,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <MediaPlayerProvider>
-          <div className="flex min-h-screen">
-            <Sidebar />
-            <main className="flex-1 p-8 lg:ml-64">
-              <div className="max-w-4xl mx-auto">
-                {children}
-              </div>
-            </main>
-          </div>
-          <MediaPlayer />
-        </MediaPlayerProvider>
+        <ErrorBoundary>
+          <MediaPlayerProvider>
+            <div className="flex min-h-screen">
+              <Sidebar />
+              <main className="flex-1 p-8 lg:ml-64">
+                <div className="max-w-4xl mx-auto">
+                  {children}
+                </div>
+              </main>
+            </div>
+            <MediaPlayer />
+          </MediaPlayerProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

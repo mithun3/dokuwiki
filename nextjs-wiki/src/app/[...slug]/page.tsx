@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import { MediaGallery } from '@/components/MediaPlayer/MediaGallery';
 import Comments from '@/components/Comments';
 import ArticleFooter from '@/components/ArticleFooter';
+import { ContentErrorBoundary } from '@/components/ContentErrorBoundary';
 
 const mdxComponents = {
   MediaGallery,
@@ -40,19 +41,21 @@ export default function ContentPage({ params }: { params: { slug: string[] } }) 
   }
 
   return (
-    <article className="wiki-content">
-      <MDXRemote
-        source={content.content}
-        components={mdxComponents}
-        options={{
-          mdxOptions: {
-            remarkPlugins: [remarkGfm],
+    <ContentErrorBoundary pagePath={params.slug.join('/')}>
+      <article className="wiki-content">
+        <MDXRemote
+          source={content.content}
+          components={mdxComponents}
+          options={{
+            mdxOptions: {
+              remarkPlugins: [remarkGfm],
 
-          },
-        }}
-      />
-      <ArticleFooter metadata={content.meta} />
-      <Comments />
-    </article>
+            },
+          }}
+        />
+        <ArticleFooter metadata={content.meta} />
+        <Comments />
+      </article>
+    </ContentErrorBoundary>
   );
 }

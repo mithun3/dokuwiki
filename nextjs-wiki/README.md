@@ -222,6 +222,27 @@ const navigationItems = [
 - **Tailwind config:** `tailwind.config.ts`
 - **Component styles:** Inline Tailwind classes
 
+## ⌨️ Keyboard Shortcuts
+
+The media player supports the following keyboard shortcuts for hands-free control:
+
+| Key(s) | Action | Notes |
+|--------|--------|-------|
+| **Space** | Play/Pause | Only works when player is active |
+| **→ (Right Arrow)** | Next Track | Skips to next track in queue |
+| **← (Left Arrow)** | Previous Track | Goes to previous track; restarts if > 3 sec in |
+| **< (Comma)** | Volume Down | Decreases volume by 10% |
+| **> (Period)** | Volume Up | Increases volume by 10% |
+| **M** | Mute/Unmute | Toggles mute state |
+| **R** | Cycle Repeat | Cycles through: none → all → one → none |
+| **S** | Toggle Shuffle | Enables/disables shuffle mode |
+| **0-9** | Jump to Position | 0=start, 5=50%, 9=90% through track |
+
+**Notes:**
+- Shortcuts only activate when player has focus
+- Typing in text inputs or textareas disables shortcuts
+- All shortcuts are non-blocking and can be tested immediately
+
 ## 🔍 Search Implementation (Optional)
 
 Two recommended options:
@@ -381,8 +402,164 @@ Before going live:
 1. **Merge to main:** Once tested, merge `migrate` branch
 2. **Tag release:** `git tag v2.0.0-nextjs`
 3. **Decommission AWS:** Follow `AWS-DECOMMISSION.md`
-4. **Add Phase 2 features:** Queue conflict modal, keyboard shortcuts
-5. **Set up analytics:** Add Vercel Analytics or Google Analytics
+4. **Set up analytics:** Add Vercel Analytics or Google Analytics
+
+## 🧪 Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+npm run test
+
+# Watch mode (re-run on file changes)
+npm run test -- --watch
+
+# UI mode (interactive test runner)
+npm run test:ui
+
+# Coverage report
+npm run test:coverage
+```
+
+### Test Structure
+
+Tests are located in `__tests__/`:
+
+- **store.test.ts** - Zustand store state management
+- **content.test.ts** - Content loading and discovery
+
+### Writing New Tests
+
+Use Vitest syntax (compatible with Jest):
+
+```typescript
+import { describe, it, expect } from 'vitest';
+
+describe('MyComponent', () => {
+  it('should do something', () => {
+    expect(true).toBe(true);
+  });
+});
+```
+
+## 👨‍💻 Development Setup
+
+### Local Development
+
+```bash
+# Clone and install
+git clone https://github.com/yourusername/dokuwiki.git
+cd nextjs-wiki
+npm install
+
+# Start dev server (http://localhost:3000)
+npm run dev
+
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+```
+
+### File Structure Best Practices
+
+- **Components:** Use `.tsx` extension, place in `src/components/`
+- **Utilities:** Use `src/lib/` for helper functions
+- **Content:** Use `.mdx` files in `content/` directory
+- **Tests:** Use `__tests__/` directory at project root
+
+### Adding New Features
+
+1. Create component in `src/components/`
+2. Add TypeScript interfaces to `src/lib/types.ts` if needed
+3. Update Zustand store if state is required
+4. Add JSDoc comments for documentation
+5. Create tests in `__tests__/`
+6. Update README if user-facing
+
+## 🔌 API Reference
+
+### useMediaPlayerStore Hook
+
+Access and control the media player:
+
+```typescript
+import { useMediaPlayerStore } from '@/lib/store';
+
+// In your component:
+const { 
+  currentTrack,          // Current playing track
+  playlist,              // Array of queued tracks
+  isPlaying,             // Boolean
+  volume,                // 0-1
+  playTrack,             // Function: play a track
+  playNext,              // Function: next track
+  togglePlayPause,       // Function: play/pause
+  setVolume,             // Function: set volume
+} = useMediaPlayerStore();
+```
+
+### MediaTrack Interface
+
+```typescript
+interface MediaTrack {
+  id: string;              // Unique identifier
+  url: string;             // Audio/video URL
+  title: string;           // Display title
+  artist?: string;         // Artist name
+  type: 'audio' | 'video'; // Media type
+  thumbnail?: string;      // Cover art URL
+  duration?: number;       // Duration in seconds
+  format?: string;         // File format (mp3, mp4, etc.)
+}
+```
+
+### ContentData Interface
+
+```typescript
+interface ContentData {
+  slug: string;        // Page path (e.g., "recording/techniques")
+  meta: {              // Frontmatter metadata
+    title: string;
+    description?: string;
+    evolutionPhase?: 'foundational' | 'refined' | 'experimental' | 'archived';
+    lastReviewedAt?: string;  // ISO date
+    status?: 'active' | 'deprecated' | 'draft';
+  };
+  content: string;     // Rendered MDX content
+}
+```
+
+### Key Functions
+
+**getContentBySlug(slug: string[])**
+```typescript
+import { getContentBySlug } from '@/lib/content';
+const content = getContentBySlug(['recording', 'techniques']);
+```
+
+**getAllContentSlugs()**
+```typescript
+import { getAllContentSlugs } from '@/lib/content';
+const allPages = getAllContentSlugs(); // Returns: [['home'], ['about'], ...]
+```
+
+## 📊 Environment Variables
+
+Create a `.env.local` file in the `nextjs-wiki` directory:
+
+```env
+# Giscus Comments (GitHub Discussions)
+NEXT_PUBLIC_GISCUS_REPO_ID=your_repo_id_here
+NEXT_PUBLIC_GISCUS_CATEGORY_ID=your_category_id_here
+
+# CDN URL for media files (optional)
+NEXT_PUBLIC_CDN_URL=https://media.example.com
+```
+
+See `.env.example` for complete documentation.
 
 ## 📚 Resources
 
@@ -391,14 +568,16 @@ Before going live:
 - [Zustand State Management](https://github.com/pmndrs/zustand)
 - [MDX Documentation](https://mdxjs.com/)
 - [Tailwind CSS](https://tailwindcss.com/docs)
+- [Vitest Testing](https://vitest.dev/)
 
 ## 🤝 Support
 
 Questions or issues? Check:
 1. This README
 2. `AWS-DECOMMISSION.md` for infrastructure cleanup
-3. Next.js documentation
-4. GitHub Issues
+3. `MEDIA-PLAYER.md` for media player features
+4. Next.js documentation
+5. GitHub Issues
 
 ---
 

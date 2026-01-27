@@ -8,6 +8,31 @@ import PlayerVolume from './PlayerVolume';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
 import { QueuePanel } from './QueuePanel';
 
+/**
+ * Main media player component
+ * 
+ * Manages audio/video playback with full controls including:
+ * - Play/pause and track navigation
+ * - Volume and mute control
+ * - Progress seeking
+ * - Queue management
+ * - Keyboard shortcuts support
+ * 
+ * State is persisted via Zustand store to localStorage
+ * 
+ * @component
+ * @example
+ * <MediaPlayer />
+ * 
+ * Features:
+ * - Dual audio/video support based on track type
+ * - Responsive mini/full modes
+ * - Intelligent track queuing with conflict detection
+ * - Keyboard shortcuts (Space, arrows, etc.)
+ * - Volume persistence across sessions
+ * 
+ * @returns {JSX.Element} Media player UI with controls
+ */
 export default function MediaPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);

@@ -2,6 +2,30 @@
 
 import { useEffect } from 'react';
 
+/**
+ * Giscus comments component
+ * 
+ * Loads GitHub Discussions-powered comments section on pages
+ * Uses Giscus repository configuration from environment variables
+ * 
+ * Features:
+ * - Maps discussions to page pathname
+ * - Supports reactions and lazy loading
+ * - Respects theme preference (light/dark)
+ * - Authenticated users via GitHub
+ * 
+ * Required environment variables:
+ * - NEXT_PUBLIC_GISCUS_REPO_ID: GitHub repository ID
+ * - NEXT_PUBLIC_GISCUS_CATEGORY_ID: Giscus discussion category ID
+ * 
+ * Setup: https://giscus.app
+ * 
+ * @component
+ * @returns {JSX.Element} Empty div container for Giscus to mount into
+ * 
+ * @example
+ * <Comments />
+ */
 export default function Comments() {
   useEffect(() => {
     // Load Giscus script with environment variables
