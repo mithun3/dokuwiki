@@ -1,0 +1,8 @@
+{
+  "backup_date": "2026-01-27T23:20:32+11:00",
+  "efs_id": "fs-08ee07690366e6e7e",
+  "backup_type": "EFS snapshot",
+  "status": "initiated",
+  "location": "./backups",
+  "estimated_size": "TBD (depends on EFS usage)"
+}
