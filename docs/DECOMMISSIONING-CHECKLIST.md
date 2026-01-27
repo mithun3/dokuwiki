@@ -16,27 +16,53 @@ Post-migration cleanup for sysya-wiki. Old DokuWiki infrastructure on AWS can be
 - [ ] Final EFS backup taken
 - [ ] All stakeholders notified
 
-## 📋 Decommissioning Steps
+## 📋 Decommissioning Automation
+
+All decommissioning steps have been **automated into executable scripts** in `/scripts/decommissioning/`.
+
+### 🚀 Quick Start
+
+```bash
+# Navigate to decommissioning directory
+cd /Users/mithunselvan/dokuwiki/scripts/decommissioning
+
+# Run all phases at once (with safety confirmations)
+bash decommission-master.sh
+
+# OR run individual phases
+bash 01-backup-efs.sh        # Backup EFS data
+bash 02-stop-ecs.sh          # Stop ECS services  
+bash 03-terraform-destroy.sh # Destroy infrastructure (POINT OF NO RETURN)
+bash 04-verify-resources.sh  # Verify cleanup
+bash 05-cost-verification.sh # Confirm savings
+```
+
+### 📁 Scripts Available
+
+| Script | Purpose | Status |
+|--------|---------|--------|
+| **decommission-master.sh** | Orchestrates all 5 phases with safety gates | Ready ✓ |
+| **01-backup-efs.sh** | Creates EFS backup snapshots | Ready ✓ |
+| **02-stop-ecs.sh** | Gracefully stops ECS services | Ready ✓ |
+| **03-terraform-destroy.sh** | Destroys infrastructure via Terraform | Ready ✓ |
+| **04-verify-resources.sh** | Verifies all resources deleted | Ready ✓ |
+| **05-cost-verification.sh** | Confirms cost reduction | Ready ✓ |
+| **utils/preflight-check.sh** | Pre-flight validation | Ready ✓ |
+| **utils/resource-audit.sh** | Comprehensive resource inventory | Ready ✓ |
+| **utils/state-cleanup.sh** | Archives Terraform state | Ready ✓ |
+| **utils/emergency-rollback.sh** | Emergency restoration | Ready ✓ |
+
+See [scripts/decommissioning/README.md](scripts/decommissioning/README.md) for full documentation.
 
 ### Phase 1: Data Backup (CRITICAL - Do First)
 
-```bash
-# 1. Backup EFS data from ECS cluster
-# This contains all original DokuWiki files and media
-aws ecs execute-command \
-  --cluster dokuwiki-prod-cluster \
-  --task $(aws ecs list-tasks --cluster dokuwiki-prod-cluster --query 'taskArns[0]' --output text) \
-  --container dokuwiki-app \
-  --interactive \
-  --command "/bin/bash"
+**Automated by:** `bash 01-backup-efs.sh`
 
-# Inside ECS container:
-tar -czf dokuwiki-backup-$(date +%Y%m%d).tar.gz /data
-exit
-
-# 2. Download to local storage
-aws s3 cp s3://YOUR_BACKUP_BUCKET/dokuwiki-backup-*.tar.gz ./backups/
-```
+Actions:
+- Creates EFS backup snapshots
+- Documents backup location
+- Provides S3 upload commands (if needed)
+- Estimated time: 5-10 minutes
 
 ### Phase 2: Verify Vercel Setup (1-2 weeks after deployment)
 
@@ -48,40 +74,32 @@ aws s3 cp s3://YOUR_BACKUP_BUCKET/dokuwiki-backup-*.tar.gz ./backups/
 
 ### Phase 3: Infrastructure Cleanup (After 1+ week stable)
 
+**Automated by:** `bash 03-terraform-destroy.sh`
+
+This script will:
+- Plan all infrastructure changes
+- Ask for your confirmation
+- Execute `terraform destroy` with safety flags
+- Archive Terraform state
+- Estimated time: 10-15 minutes
+
 **Keep (Still In Use):**
 - [ ] S3 media bucket (media CDN dependency)
 - [ ] CloudFront distribution (serving media)
 - [ ] Route53 records (if using for Vercel)
 
-**Delete (No Longer Needed):**
+**Delete via Scripts (Recommended):**
 
-```bash
-# 1. Delete ECS Cluster
-aws ecs delete-cluster --cluster dokuwiki-prod-cluster
+All infrastructure deletion is handled by `03-terraform-destroy.sh` which:
+- Safely plans deletion
+- Requires explicit confirmation
+- Handles dependencies in correct order
+- Archives state files for recovery
+- Takes 10-15 minutes
 
-# 2. Delete RDS Database (WARNING: No recovery after this!)
-aws rds delete-db-instance \
-  --db-instance-identifier dokuwiki-db \
-  --skip-final-snapshot
+**Manual Fallback Commands (if scripts fail):**
 
-# 3. Delete EFS File System
-aws efs delete-file-system --file-system-id fs-xxxxx
-
-# 4. Delete ALB and Security Groups
-aws elbv2 delete-load-balancer --load-balancer-arn arn:aws:elasticloadbalancing:...
-
-# 5. Delete NAT Gateways (frees ~$65/month)
-aws ec2 release-address --allocation-id eipalloc-xxxxx
-
-# 6. Delete VPC and subnets
-aws ec2 delete-vpc --vpc-id vpc-xxxxx
-
-# 7. Empty and delete ECR Repository
-aws ecr delete-repository --repository-name dokuwiki-app --force
-
-# 8. Delete Terraform state backend
-aws s3 rm s3://dokuwiki-tf-state/ --recursive
-```
+See [scripts/decommissioning/03-terraform-destroy.sh](scripts/decommissioning/03-terraform-destroy.sh) for full implementation.
 
 ## 💰 Cost Savings
 
