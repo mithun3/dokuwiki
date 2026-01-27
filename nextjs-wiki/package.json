@@ -9,9 +9,9 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test": "vitest run --config .vitest/vitest.config.ts",
+    "test:ui": "vitest --ui --config .vitest/vitest.config.ts",
+    "test:coverage": "vitest --coverage --config .vitest/vitest.config.ts"
   },
   "dependencies": {
     "next": "^14.2.0",

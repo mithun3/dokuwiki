@@ -246,11 +246,10 @@ describe('Media Player Store', () => {
 
   describe('Shuffle', () => {
     it('should toggle shuffle', () => {
-      const store = useMediaPlayerStore.getState();
-      store.setIsShuffled(false);
-      store.toggleShuffle();
+      useMediaPlayerStore.setState({ isShuffled: false });
+      useMediaPlayerStore.getState().toggleShuffle();
       expect(useMediaPlayerStore.getState().isShuffled).toBe(true);
-      store.toggleShuffle();
+      useMediaPlayerStore.getState().toggleShuffle();
       expect(useMediaPlayerStore.getState().isShuffled).toBe(false);
     });
 
