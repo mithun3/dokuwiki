@@ -88,21 +88,12 @@ jobs:
       - name: Commit Changes
         run: |
           git add CHANGELOG.md nextjs-wiki/package.json
-          git commit -m "chore: release v${{ github.event.inputs.version }}" \
-            -m "Release: v${{ github.event.inputs.version }}" \
-            -m "Date: $(date +%Y-%m-%d)" \
-            -m "Changes: ${{ github.event.inputs.changelog_entry }}"
-          
+          git commit -m "chore: release v${{ github.event.inputs.version }}" -m "Release: v${{ github.event.inputs.version }}" -m "Date: $(date +%Y-%m-%d)" -m "Changes: ${{ github.event.inputs.changelog_entry }}"
           echo "✅ Changes committed"
       
       - name: Create Git Tag
         run: |
-          git tag -a "v${{ github.event.inputs.version }}" \
-            -m "Release v${{ github.event.inputs.version }}" \
-            -m "Date: $(date +%Y-%m-%d)" \
-            -m "Changes: ${{ github.event.inputs.changelog_entry }}" \
-            -m "See CHANGELOG.md for full details."
-          
+          git tag -a "v${{ github.event.inputs.version }}" -m "Release v${{ github.event.inputs.version }}" -m "Date: $(date +%Y-%m-%d)" -m "Changes: ${{ github.event.inputs.changelog_entry }}" -m "See CHANGELOG.md for full details."
           echo "✅ Git tag created: v${{ github.event.inputs.version }}"
       
       - name: Push Changes and Tags
