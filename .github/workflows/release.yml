@@ -80,7 +80,7 @@ jobs:
       - name: Update package.json Version
         run: |
           # Update version in package.json
-          sed -i '' "s/\"version\": \"[^\"]*\"/\"version\": \"${{ github.event.inputs.version }}\"/g" \
+          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"${{ github.event.inputs.version }}\"/g" \
             nextjs-wiki/package.json
           
           echo "✅ package.json updated to v${{ github.event.inputs.version }}"
@@ -88,24 +88,12 @@ jobs:
       - name: Commit Changes
         run: |
           git add CHANGELOG.md nextjs-wiki/package.json
-          git commit -m "chore: release v${{ github.event.inputs.version }}
-
-Release: v${{ github.event.inputs.version }}
-Date: $(date +%Y-%m-%d)
-Changes: ${{ github.event.inputs.changelog_entry }}"
-          
+          git commit -m "chore: release v${{ github.event.inputs.version }}" -m "Release: v${{ github.event.inputs.version }}" -m "Date: $(date +%Y-%m-%d)" -m "Changes: ${{ github.event.inputs.changelog_entry }}"
           echo "✅ Changes committed"
       
       - name: Create Git Tag
         run: |
-          git tag -a "v${{ github.event.inputs.version }}" \
-            -m "Release v${{ github.event.inputs.version }}
-
-Date: $(date +%Y-%m-%d)
-Changes: ${{ github.event.inputs.changelog_entry }}
-
-See CHANGELOG.md for full details."
-          
+          git tag -a "v${{ github.event.inputs.version }}" -m "Release v${{ github.event.inputs.version }}" -m "Date: $(date +%Y-%m-%d)" -m "Changes: ${{ github.event.inputs.changelog_entry }}" -m "See CHANGELOG.md for full details."
           echo "✅ Git tag created: v${{ github.event.inputs.version }}"
       
       - name: Push Changes and Tags
@@ -115,17 +103,17 @@ See CHANGELOG.md for full details."
           
           echo "✅ Changes and tags pushed to remote"
       
+      - name: Wait for Tag Sync
+        run: |
+          sleep 2
+          echo "✅ Waited for tag synchronization"
+      
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.event.inputs.version }}
-          release_name: Release v${{ github.event.inputs.version }}
           body: |
             # v${{ github.event.inputs.version }}
-
-            **Release Date:** $(date +%Y-%m-%d)
 
             ## Changes
             ${{ github.event.inputs.changelog_entry }}
@@ -133,6 +121,10 @@ See CHANGELOG.md for full details."
             For full details, see [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.release_branch }}/CHANGELOG.md)
           draft: false
           prerelease: false
+          generate_release_notes: true
+          target_commitish: ${{ github.event.inputs.release_branch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Success Summary
         run: |
