@@ -1,4 +1,7 @@
-# Changelog
+## [2.0.1] - 2026-01-31
+
+### Changes
+- actions. minor refactor. test cases. 
 
 ## [2.0.0] - 2026-01-27
 
