@@ -103,6 +103,11 @@ jobs:
           
           echo "✅ Changes and tags pushed to remote"
       
+      - name: Wait for Tag Sync
+        run: |
+          sleep 2
+          echo "✅ Waited for tag synchronization"
+      
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -116,6 +121,8 @@ jobs:
             For full details, see [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.event.inputs.release_branch }}/CHANGELOG.md)
           draft: false
           prerelease: false
+          generate_release_notes: true
+          target_commitish: ${{ github.event.inputs.release_branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
