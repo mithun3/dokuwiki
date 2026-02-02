@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: write
       discussions: read
+      issues: write
     
     steps:
       - name: Checkout repository
@@ -80,9 +81,11 @@ jobs:
 
       - name: Create issue if backup fails
         if: failure()
-        uses: actions/create-issue@v2
-        with:
-          title: "⚠️ Discussions backup failed"
-          body: |
-            The weekly backup of GitHub Discussions failed.
-            Please check the workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "⚠️ Discussions backup failed" \
+            --body "The weekly backup of GitHub Discussions failed.
+          
+          Please check the workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
