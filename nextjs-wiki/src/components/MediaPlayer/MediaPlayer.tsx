@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useMediaPlayerStore } from '@/lib/store';
 import PlayerControls from './PlayerControls';
 import PlayerProgress from './PlayerProgress';
 import PlayerVolume from './PlayerVolume';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
 import { QueuePanel } from './QueuePanel';
+import { ABToggle, ABIndicator } from './ABToggle';
+import type { ABVariant } from '@/lib/types';
 
 /**
  * Main media player component
@@ -36,6 +38,15 @@ import { QueuePanel } from './QueuePanel';
 export default function MediaPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // A/B Mode: Multiple audio refs for instant switching
+  const abAudioRefs = useRef<Record<ABVariant, HTMLAudioElement | null>>({
+    A: null,
+    B: null,
+    C: null,
+    D: null,
+  });
+  
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   
   const {
@@ -50,12 +61,131 @@ export default function MediaPlayer() {
     setCurrentTime,
     setDuration,
     playNext,
+    // A/B Mode state
+    isABMode,
+    abGroup,
+    activeVariant,
   } = useMediaPlayerStore();
 
   const mediaRef = currentTrack?.type === 'video' ? videoRef : audioRef;
 
-  // Handle play/pause
+  // ============================================
+  // A/B MODE: Multi-Audio Element Management
+  // ============================================
+  
+  // Initialize A/B audio elements when entering A/B mode
   useEffect(() => {
+    if (!isABMode || !abGroup) return;
+    
+    // Load all tracks into their respective audio elements
+    abGroup.tracks.forEach(track => {
+      const audioEl = abAudioRefs.current[track.abVariant];
+      if (audioEl) {
+        audioEl.src = track.url;
+        audioEl.load();
+        audioEl.volume = isMuted ? 0 : volume;
+        // Mute all except active variant
+        audioEl.muted = track.abVariant !== activeVariant;
+      }
+    });
+  }, [isABMode, abGroup]);
+
+  // A/B Mode: Handle variant switching (mute/unmute)
+  useEffect(() => {
+    if (!isABMode || !abGroup) return;
+    
+    abGroup.tracks.forEach(track => {
+      const audioEl = abAudioRefs.current[track.abVariant];
+      if (audioEl) {
+        // Only the active variant should be audible
+        audioEl.muted = track.abVariant !== activeVariant;
+      }
+    });
+  }, [activeVariant, isABMode, abGroup]);
+
+  // A/B Mode: Sync all audio elements to same position
+  const syncABPositions = useCallback((targetTime: number) => {
+    if (!isABMode || !abGroup) return;
+    
+    abGroup.tracks.forEach(track => {
+      const audioEl = abAudioRefs.current[track.abVariant];
+      if (audioEl && Math.abs(audioEl.currentTime - targetTime) > 0.1) {
+        audioEl.currentTime = targetTime;
+      }
+    });
+  }, [isABMode, abGroup]);
+
+  // A/B Mode: Play/pause all audio elements together
+  useEffect(() => {
+    if (!isABMode || !abGroup) return;
+    
+    abGroup.tracks.forEach(track => {
+      const audioEl = abAudioRefs.current[track.abVariant];
+      if (audioEl) {
+        if (isPlaying) {
+          audioEl.play().catch(console.error);
+        } else {
+          audioEl.pause();
+        }
+      }
+    });
+  }, [isPlaying, isABMode, abGroup]);
+
+  // A/B Mode: Update time from active variant
+  useEffect(() => {
+    if (!isABMode || !abGroup) return;
+    
+    const activeAudio = abAudioRefs.current[activeVariant];
+    if (!activeAudio) return;
+    
+    const handleTimeUpdate = () => {
+      setCurrentTime(activeAudio.currentTime);
+      // Keep other tracks in sync
+      syncABPositions(activeAudio.currentTime);
+    };
+    
+    const handleLoadedMetadata = () => {
+      setDuration(activeAudio.duration);
+    };
+    
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+      syncABPositions(0);
+    };
+    
+    activeAudio.addEventListener('timeupdate', handleTimeUpdate);
+    activeAudio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    activeAudio.addEventListener('ended', handleEnded);
+    
+    return () => {
+      activeAudio.removeEventListener('timeupdate', handleTimeUpdate);
+      activeAudio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      activeAudio.removeEventListener('ended', handleEnded);
+    };
+  }, [isABMode, abGroup, activeVariant, setCurrentTime, setDuration, setIsPlaying, syncABPositions]);
+
+  // A/B Mode: Volume control for all elements
+  useEffect(() => {
+    if (!isABMode || !abGroup) return;
+    
+    const effectiveVolume = isMuted ? 0 : volume;
+    abGroup.tracks.forEach(track => {
+      const audioEl = abAudioRefs.current[track.abVariant];
+      if (audioEl) {
+        audioEl.volume = effectiveVolume;
+      }
+    });
+  }, [volume, isMuted, isABMode, abGroup]);
+
+  // ============================================
+  // REGULAR MODE: Single Audio/Video Element
+  // ============================================
+
+  // Handle play/pause (regular mode only)
+  useEffect(() => {
+    if (isABMode) return; // A/B mode handled separately
+    
     const media = mediaRef.current;
     if (!media || !currentTrack) return;
 
@@ -64,18 +194,22 @@ export default function MediaPlayer() {
     } else {
       media.pause();
     }
-  }, [isPlaying, currentTrack]);
+  }, [isPlaying, currentTrack, isABMode]);
 
-  // Handle volume
+  // Handle volume (regular mode only)
   useEffect(() => {
+    if (isABMode) return; // A/B mode handled separately
+    
     const media = mediaRef.current;
     if (!media) return;
     
     media.volume = isMuted ? 0 : volume;
-  }, [volume, isMuted]);
+  }, [volume, isMuted, isABMode]);
 
-  // Handle track change
+  // Handle track change (regular mode only)
   useEffect(() => {
+    if (isABMode) return; // A/B mode handled separately
+    
     const media = mediaRef.current;
     if (!media || !currentTrack) return;
 
@@ -86,10 +220,12 @@ export default function MediaPlayer() {
     if (isPlaying) {
       media.play().catch(console.error);
     }
-  }, [currentTrack]);
+  }, [currentTrack, isABMode]);
 
-  // Update current time
+  // Update current time (regular mode only)
   useEffect(() => {
+    if (isABMode) return; // A/B mode handled separately
+    
     const media = mediaRef.current;
     if (!media) return;
 
@@ -114,13 +250,20 @@ export default function MediaPlayer() {
       media.removeEventListener('loadedmetadata', handleLoadedMetadata);
       media.removeEventListener('ended', handleEnded);
     };
-  }, [currentTrack?.type, setCurrentTime, setDuration, playNext]);
+  }, [currentTrack?.type, setCurrentTime, setDuration, playNext, isABMode]);
 
   const handleSeek = (time: number) => {
-    const media = mediaRef.current;
-    if (media) {
-      media.currentTime = time;
+    if (isABMode) {
+      // A/B Mode: sync all audio elements
+      syncABPositions(time);
       setCurrentTime(time);
+    } else {
+      // Regular mode: single element
+      const media = mediaRef.current;
+      if (media) {
+        media.currentTime = time;
+        setCurrentTime(time);
+      }
     }
   };
 
@@ -134,6 +277,12 @@ export default function MediaPlayer() {
     <>
       <KeyboardShortcuts />
       <audio ref={audioRef} style={{ display: 'none' }} />
+      
+      {/* A/B Mode: Multiple hidden audio elements for instant switching */}
+      <audio ref={el => { abAudioRefs.current.A = el; }} style={{ display: 'none' }} />
+      <audio ref={el => { abAudioRefs.current.B = el; }} style={{ display: 'none' }} />
+      <audio ref={el => { abAudioRefs.current.C = el; }} style={{ display: 'none' }} />
+      <audio ref={el => { abAudioRefs.current.D = el; }} style={{ display: 'none' }} />
       
       <div className={`media-player ${isVisible ? 'visible' : ''} ${isMini ? 'media-player-mini' : ''} bg-white`}>
         {/* Video Display */}
@@ -168,16 +317,27 @@ export default function MediaPlayer() {
                   {currentTrack.artist}
                 </div>
               )}
+              {/* A/B Mode Indicator */}
+              {isABMode && <ABIndicator />}
             </div>
-            {/* Queue Button */}
-            <button
-              onClick={() => setIsQueueOpen(!isQueueOpen)}
-              className="flex-shrink-0 p-2 hover:bg-gray-100 rounded transition text-gray-600"
-              title="Toggle queue"
-            >
-              📋
-            </button>
+            {/* Queue Button - hidden in A/B mode */}
+            {!isABMode && (
+              <button
+                onClick={() => setIsQueueOpen(!isQueueOpen)}
+                className="flex-shrink-0 p-2 hover:bg-gray-100 rounded transition text-gray-600"
+                title="Toggle queue"
+              >
+                📋
+              </button>
+            )}
           </div>
+
+          {/* A/B Toggle Controls */}
+          {isABMode && (
+            <div className="mb-2">
+              <ABToggle />
+            </div>
+          )}
 
           {/* Controls & Progress */}
           <div className="mb-2">

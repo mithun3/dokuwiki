@@ -74,7 +74,10 @@ Visit http://localhost:3000 to preview the site.
 - ✅ **Audio & Video Support** - MP3, WAV, OGG, AAC, M4A, OPUS, FLAC, MP4, WebM, OGV
 - ✅ **Format Badges** - Visual format tags (mp3, mp4, etc.)
 - ✅ **Thumbnail Support** - Optional preview images for media files
-- ✅ **Media Cards** - Professional-looking clickable media previews
+- ✅ **AudioCard Component** - Professional card UI for single audio tracks with Play/Queue buttons
+- ✅ **VideoCard Component** - Professional card UI for video content with 16:9 thumbnails
+- ✅ **A/B Comparison Mode** - Instant switching between audio variants for comparisons
+- ✅ **ABComparisonCard Component** - Unified A/B comparison UI with variant toggles
 
 ### How It Works
 
@@ -111,28 +114,61 @@ Use standard markdown links with optional data attributes:
 |-------|-------|
 | MP3, WAV, OGG, AAC, M4A, OPUS, FLAC | MP4, WebM, OGV |
 
-### Media Card Component
+### Media Card Components
 
-The media player now includes a professional `MediaCard` component that displays:
-- Large thumbnail image with overlay
-- Format badge (mp3, mp4, etc.) in top-right
-- Play button overlay on hover
-- Title and artist metadata
-- Color-coded format tags (blue for audio, orange for video)
+The media player includes professional card components for displaying media with rich UI:
 
-**Example Usage in MDX:**
+#### AudioCard
+
+Displays a single audio track with thumbnail, metadata, and action buttons.
 
 ```mdx
----
-title: "My Audio Collection"
----
+<AudioCard
+  url="https://cdn.example.com/track.mp3"
+  title="Beautiful Song"
+  thumbnail="https://cdn.example.com/cover.jpg"
+  artist="The Artist"
+  duration="3:45"
+/>
+```
 
-# Featured Tracks
+**Features:**
+- Horizontal layout with thumbnail + content
+- Format badge (MP3, WAV, etc.)
+- "Play Now" and "Queue" buttons
+- "Now Playing" indicator with animation
+- Waveform placeholder (future enhancement)
 
-Click any track below to play:
+#### VideoCard
 
-- [Beautiful Song](https://cdn.example.com/track1.mp3 "data-thumbnail=https://cdn.example.com/covers/track1.jpg" "data-artist=The Artist")
-- [Another Track](https://cdn.example.com/track2.wav "data-thumbnail=https://cdn.example.com/covers/track2.jpg")
+Displays a video with 16:9 aspect ratio thumbnail.
+
+```mdx
+<VideoCard
+  url="https://cdn.example.com/video.mp4"
+  title="Big Buck Bunny"
+  thumbnail="https://cdn.example.com/poster.jpg"
+  artist="Blender Foundation"
+  duration="9:56"
+/>
+```
+
+**Features:**
+- 16:9 aspect ratio thumbnail
+- Play button overlay on hover
+- Duration badge
+- "Play Now" and "Queue" buttons
+
+#### Grid Layout
+
+Use a responsive grid to display multiple cards:
+
+```mdx
+<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 my-8">
+  <AudioCard url="..." title="Track 1" />
+  <AudioCard url="..." title="Track 2" />
+  <AudioCard url="..." title="Track 3" />
+</div>
 ```
 
 ### Queue Conflict Modal (Planned - Phase 2)
@@ -141,6 +177,66 @@ When clicking a new track while something is playing, user will see options:
 1. **Replace & Play** - Clear playlist, play new track immediately
 2. **Play Next** - Insert after current track
 3. **Add to Queue** - Append to end of playlist
+
+### A/B Comparison Mode
+
+The media player supports instant A/B comparison between audio files—perfect for comparing different mixes, equipment recordings, or audio codec quality.
+
+#### How It Works
+
+1. Name your audio files with variant suffixes: `trackname_A.mp3`, `trackname_B.mp3`
+2. Click on Track A, then click on Track B
+3. The player detects they belong together and enters A/B mode
+4. Use keyboard shortcuts to switch instantly at the same playback position
+
+#### File Naming Convention
+
+Files are detected as A/B pairs using these patterns:
+
+| Pattern | Examples |
+|---------|----------|
+| `_A` / `_B` suffix | `guitar-clean_A.mp3`, `guitar-clean_B.mp3` |
+| `-A` / `-B` suffix | `vocal-take-A.wav`, `vocal-take-B.wav` |
+| `v1` / `v2` suffix | `mix_v1.mp3`, `mix_v2.mp3` |
+| Up to 4 variants | `_A`, `_B`, `_C`, `_D` or `v1`, `v2`, `v3`, `v4` |
+
+#### Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| **A** | Switch to variant A |
+| **B** | Switch to variant B |
+| **C** | Switch to variant C (if available) |
+| **D** | Switch to variant D (if available) |
+| **ESC** | Exit A/B comparison mode |
+
+#### Use Cases
+
+- **Equipment Comparisons** - Compare different microphones, pedals, or preamps
+- **Mix Revisions** - A/B between mix versions at the same timestamp
+- **Codec Quality** - Compare lossy vs lossless at identical positions
+- **Before/After** - Hear the effect of processing or mastering
+
+#### Example in MDX
+
+```markdown
+## Distortion Pedal Comparison
+
+Compare the valve warmth vs solid-state brightness:
+
+- [Guyatone MM-X (Valve)](https://cdn.example.com/pedal_A.mp3)
+- [Boss SD-1 (Solid-State)](https://cdn.example.com/pedal_B.mp3)
+```
+
+#### Technical Details
+
+The A/B mode uses **multiple hidden audio elements** that play simultaneously (muted), allowing instant switching without any loading delay. Playback position is synced across all variants.
+
+**Files:**
+- `src/lib/abUtils.ts` - Detection and grouping utilities
+- `src/lib/store.ts` - A/B mode state management
+- `src/components/MediaPlayer/ABToggle.tsx` - UI toggle component
+- `src/components/MediaPlayer/KeyboardShortcuts.tsx` - Keyboard handlers
 
 ## 📁 Project Structure
 
@@ -158,20 +254,30 @@ nextjs-wiki/
 │   │   └── MediaPlayer/
 │   │       ├── MediaPlayer.tsx          # Main player UI
 │   │       ├── MediaPlayerProvider.tsx  # Context + link interception
-│   │       ├── MediaCard.tsx            # Professional media preview cards
+│   │       ├── AudioCard.tsx            # Audio track card with Play/Queue
+│   │       ├── VideoCard.tsx            # Video card with 16:9 thumbnails
+│   │       ├── ABComparisonCard.tsx     # A/B comparison unified card
 │   │       ├── FormatBadge.tsx          # Format tag/badge component
 │   │       ├── PlayerControls.tsx       # Play/pause/skip buttons
 │   │       ├── PlayerProgress.tsx       # Progress bar + time
-│   │       └── PlayerVolume.tsx         # Volume slider
+│   │       ├── PlayerVolume.tsx         # Volume slider
+│   │       ├── ABToggle.tsx             # A/B comparison toggle UI
+│   │       └── KeyboardShortcuts.tsx    # Keyboard shortcut handlers
 │   └── lib/
 │       ├── store.ts             # Zustand state management
 │       ├── types.ts             # TypeScript interfaces
-│       └── content.ts           # MDX content loader
+│       ├── abUtils.ts           # A/B comparison utilities
+│       └── content.ts           # MDX content loader (supports index.mdx)
 ├── content/
 │   ├── recording.mdx            # Recording namespace index
-│   ├── sounds.mdx               # Sounds namespace index
-│   ├── audio.mdx                # Audio examples with working samples
-│   ├── video.mdx                # Video examples with working samples
+│   ├── audio.mdx                # Audio examples with AudioCard
+│   ├── sounds/
+│   │   └── index.mdx            # Sounds page with AudioCard grid
+│   ├── video/
+│   │   └── index.mdx            # Video page with VideoCard grid
+│   ├── equipment/
+│   │   ├── index.mdx            # Equipment index page
+│   │   └── distortion.mdx       # Distortion pedal A/B comparisons
 │   └── recording/
 │       ├── techniques.mdx
 │       ├── best-practices.mdx

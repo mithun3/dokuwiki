@@ -55,7 +55,13 @@ export interface ContentData {
 export function getContentBySlug(slug: string[]): ContentData | null {
   try {
     const slugPath = slug.join('/');
-    const filePath = path.join(contentDirectory, `${slugPath}.mdx`);
+    let filePath = path.join(contentDirectory, `${slugPath}.mdx`);
+    
+    // Check for direct file first (e.g., equipment.mdx)
+    if (!fs.existsSync(filePath)) {
+      // Fallback to index.mdx in folder (e.g., equipment/index.mdx)
+      filePath = path.join(contentDirectory, slugPath, 'index.mdx');
+    }
     
     if (!fs.existsSync(filePath)) {
       return null;

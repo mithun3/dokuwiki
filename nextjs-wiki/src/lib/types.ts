@@ -67,3 +67,61 @@ export interface QueueAction {
   type: 'replace' | 'play-next' | 'add-to-end';
   track: MediaTrack;
 }
+
+// ============================================
+// A/B COMPARISON MODE TYPES
+// ============================================
+
+/**
+ * Variant identifier for A/B comparison tracks
+ * Supports up to 4 simultaneous comparison tracks
+ */
+export type ABVariant = 'A' | 'B' | 'C' | 'D';
+
+/**
+ * A single track within an A/B comparison group
+ * Extends MediaTrack with variant-specific metadata
+ * 
+ * @interface ABTrack
+ * @extends {MediaTrack}
+ * @property {string} abGroupId - Unique identifier linking tracks in the same comparison group
+ * @property {ABVariant} abVariant - Which variant this track represents (A, B, C, or D)
+ */
+export interface ABTrack extends MediaTrack {
+  abGroupId: string;
+  abVariant: ABVariant;
+}
+
+/**
+ * A group of 2-4 tracks for A/B comparison
+ * All tracks should have approximately the same duration (±5 seconds)
+ * 
+ * @interface ABTrackGroup
+ * @property {string} id - Unique identifier for this comparison group
+ * @property {string} baseName - Common name extracted from filenames (e.g., "piano-mix")
+ * @property {ABTrack[]} tracks - Array of 2-4 tracks to compare
+ * @property {number} [duration] - Expected duration in seconds (used for sync validation)
+ */
+export interface ABTrackGroup {
+  id: string;
+  baseName: string;
+  tracks: ABTrack[];
+  duration?: number;
+}
+
+/**
+ * Result of parsing a filename for A/B variant detection
+ * 
+ * @interface ABParseResult
+ * @property {boolean} isABTrack - Whether the filename matches A/B naming convention
+ * @property {string} [baseName] - Common name without variant suffix
+ * @property {ABVariant} [variant] - Detected variant (A, B, C, D)
+ * @property {string} [extension] - File extension
+ */
+export interface ABParseResult {
+  isABTrack: boolean;
+  baseName?: string;
+  variant?: ABVariant;
+  extension?: string;
+}
+

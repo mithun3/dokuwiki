@@ -2,10 +2,14 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import { getContentBySlug } from '@/lib/content';
 import { notFound } from 'next/navigation';
 import remarkGfm from 'remark-gfm';
-import { MediaGallery } from '@/components/MediaPlayer/MediaGallery';
+import AudioCard from '@/components/MediaPlayer/AudioCard';
+import VideoCard from '@/components/MediaPlayer/VideoCard';
+import ABComparisonCard from '@/components/MediaPlayer/ABComparisonCard';
 
 const mdxComponents = {
-  MediaGallery,
+  AudioCard,
+  VideoCard,
+  ABComparisonCard,
 };
 
 export const metadata = {

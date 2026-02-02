@@ -19,6 +19,18 @@ interface MediaGalleryProps {
 /**
  * Media Gallery Component
  * 
+ * @deprecated Use AudioCard, VideoCard, or ABComparisonCard components instead.
+ * This component auto-discovers media links but has been replaced by explicit
+ * card components for better control and consistency.
+ * 
+ * Migration:
+ * - For audio: <AudioCard url="..." title="..." />
+ * - For video: <VideoCard url="..." title="..." />
+ * - For A/B comparison: <ABComparisonCard title="..." variants={[...]} />
+ * 
+ * This component is no longer registered in mdxComponents and will be removed
+ * in a future version.
+ * 
  * Auto-discovers media links in page content and displays them as a gallery.
  * Includes play all and shuffle buttons.
  * 
