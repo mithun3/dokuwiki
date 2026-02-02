@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { MediaTrack, PlayerState } from '@/lib/types';
+import type { MediaTrack, PlayerState, ABTrackGroup, ABVariant } from '@/lib/types';
 
 /**
  * Complete media player store interface
@@ -22,6 +22,12 @@ interface MediaPlayerStore extends PlayerState {
     currentTrack: MediaTrack | null;
     newTrack: MediaTrack | null;
   };
+  
+  // A/B Comparison Mode State
+  isABMode: boolean;
+  abGroup: ABTrackGroup | null;
+  activeVariant: ABVariant;
+  
   // State setters
   setCurrentTrack: (track: MediaTrack | null) => void;
   setPlaylist: (tracks: MediaTrack[]) => void;
@@ -46,6 +52,11 @@ interface MediaPlayerStore extends PlayerState {
   // Queue conflict modal
   openQueueConflictModal: (currentTrack: MediaTrack, newTrack: MediaTrack) => void;
   closeQueueConflictModal: () => void;
+  
+  // A/B Comparison Mode Actions
+  enterABMode: (group: ABTrackGroup) => void;
+  exitABMode: () => void;
+  switchVariant: (variant: ABVariant) => void;
 }
 
 /**
@@ -92,6 +103,11 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
         currentTrack: null,
         newTrack: null,
       },
+      
+      // A/B Comparison Mode Initial State
+      isABMode: false,
+      abGroup: null,
+      activeVariant: 'A' as ABVariant,
 
       // State setters
       /** Sets the currently playing track */
@@ -314,6 +330,72 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
             currentTrack: null,
             newTrack: null,
           },
+        });
+      },
+
+      // ============================================
+      // A/B COMPARISON MODE ACTIONS
+      // ============================================
+      
+      /**
+       * Enter A/B comparison mode with a track group
+       * Sets up multi-track synchronized playback
+       * @param {ABTrackGroup} group - Group of 2-4 tracks to compare
+       */
+      enterABMode: (group) => {
+        if (group.tracks.length < 2) return;
+        
+        // Start with variant A
+        const trackA = group.tracks.find(t => t.abVariant === 'A') || group.tracks[0];
+        
+        set({
+          isABMode: true,
+          abGroup: group,
+          activeVariant: trackA.abVariant,
+          currentTrack: trackA,
+          isVisible: true,
+          isPlaying: false, // Don't auto-play, let user start
+          currentTime: 0,
+          // Clear regular playlist when entering A/B mode
+          playlist: [],
+          currentIndex: 0,
+        });
+      },
+      
+      /**
+       * Exit A/B comparison mode
+       * Returns to normal single-track playback
+       */
+      exitABMode: () => {
+        set({
+          isABMode: false,
+          abGroup: null,
+          activeVariant: 'A',
+          isPlaying: false,
+          currentTrack: null,
+          isVisible: false,
+        });
+      },
+      
+      /**
+       * Switch to a different variant in A/B mode
+       * Maintains current playback position for seamless comparison
+       * @param {ABVariant} variant - Target variant (A, B, C, or D)
+       */
+      switchVariant: (variant) => {
+        const { abGroup, isABMode, currentTime } = get();
+        
+        if (!isABMode || !abGroup) return;
+        
+        const targetTrack = abGroup.tracks.find(t => t.abVariant === variant);
+        if (!targetTrack) return;
+        
+        // Switch variant while preserving position
+        // Note: actual audio switching is handled by MediaPlayer component
+        set({
+          activeVariant: variant,
+          currentTrack: targetTrack,
+          // currentTime is preserved - MediaPlayer will sync audio elements
         });
       },
     }),

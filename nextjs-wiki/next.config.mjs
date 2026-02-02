@@ -33,9 +33,6 @@ const nextConfig = {
       },
     ],
   },
-
-  // Output standalone for potential Docker deployment
-  output: 'standalone',
 };
 
 const withMDX = createMDX({

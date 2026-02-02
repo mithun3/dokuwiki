@@ -1,18 +1,23 @@
 'use client';
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { useMediaPlayerStore } from '@/lib/store';
-import type { MediaTrack } from '@/lib/types';
+import type { MediaTrack, ABTrackGroup } from '@/lib/types';
 import { QueueConflictModal } from './QueueConflictModal';
+import { parseABFilename, isSameABGroup, createABGroup } from '@/lib/abUtils';
 
 interface MediaPlayerContextType {
   playTrack: (track: MediaTrack, replacePlaylist?: boolean) => void;
   interceptMediaLinks: () => void;
+  enterABComparison: (tracks: MediaTrack[]) => void;
 }
 
 const MediaPlayerContext = createContext<MediaPlayerContextType | undefined>(undefined);
 
 export function MediaPlayerProvider({ children }: { children: React.ReactNode }) {
+  // Track pending A/B tracks for grouping
+  const pendingABTracks = useRef<MediaTrack[]>([]);
+  
   const {
     playTrack: storePlayTrack,
     isPlaying,
@@ -21,10 +26,22 @@ export function MediaPlayerProvider({ children }: { children: React.ReactNode })
     openQueueConflictModal,
     closeQueueConflictModal,
     addToPlaylist,
+    enterABMode,
+    isABMode,
   } = useMediaPlayerStore();
 
   const playTrack = (track: MediaTrack, replacePlaylist = false) => {
     storePlayTrack(track, replacePlaylist);
+  };
+
+  /**
+   * Enter A/B comparison mode with an array of tracks
+   */
+  const enterABComparison = (tracks: MediaTrack[]) => {
+    const group = createABGroup(tracks);
+    if (group) {
+      enterABMode(group);
+    }
   };
 
   const interceptMediaLinks = () => {
@@ -65,6 +82,26 @@ export function MediaPlayerProvider({ children }: { children: React.ReactNode })
           format,
         };
         
+        // Check if this is an A/B track
+        const abParsed = parseABFilename(href);
+        
+        if (abParsed.isABTrack && !isVideo) {
+          // A/B track detected - check if we should start comparison mode
+          
+          // If currently playing an A/B track from same group, offer comparison
+          if (currentTrack && isSameABGroup(currentTrack.url, href)) {
+            // Found matching A/B pair - enter comparison mode
+            const group = createABGroup([currentTrack, track]);
+            if (group) {
+              enterABMode(group);
+              return;
+            }
+          }
+          
+          // Otherwise, treat as regular track for now
+          // (Could collect pending tracks for batch comparison)
+        }
+        
         // Check if something is already playing
         if (isPlaying && currentTrack) {
           // Show queue conflict modal
@@ -85,10 +122,10 @@ export function MediaPlayerProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     const cleanup = interceptMediaLinks();
     return cleanup;
-  }, [isPlaying, currentTrack]);
+  }, [isPlaying, currentTrack, isABMode]);
 
   return (
-    <MediaPlayerContext.Provider value={{ playTrack, interceptMediaLinks }}>
+    <MediaPlayerContext.Provider value={{ playTrack, interceptMediaLinks, enterABComparison }}>
       {children}
       <QueueConflictModal
         isOpen={queueConflictModal.isOpen}

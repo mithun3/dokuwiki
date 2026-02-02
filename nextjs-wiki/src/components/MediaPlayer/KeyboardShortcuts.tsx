@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useMediaPlayerStore } from '@/lib/store';
+import type { ABVariant } from '@/lib/types';
 
 export function KeyboardShortcuts() {
   const {
@@ -19,6 +20,11 @@ export function KeyboardShortcuts() {
     toggleShuffle,
     setCurrentTime,
     duration,
+    // A/B Mode
+    isABMode,
+    abGroup,
+    switchVariant,
+    exitABMode,
   } = useMediaPlayerStore();
 
   useEffect(() => {
@@ -30,6 +36,53 @@ export function KeyboardShortcuts() {
       }
 
       switch (e.code) {
+        // ============================================
+        // A/B MODE SHORTCUTS
+        // ============================================
+        
+        case 'KeyA':
+          if (isABMode && abGroup) {
+            e.preventDefault();
+            const hasA = abGroup.tracks.some(t => t.abVariant === 'A');
+            if (hasA) switchVariant('A');
+          }
+          break;
+
+        case 'KeyB':
+          if (isABMode && abGroup) {
+            e.preventDefault();
+            const hasB = abGroup.tracks.some(t => t.abVariant === 'B');
+            if (hasB) switchVariant('B');
+          }
+          break;
+
+        case 'KeyC':
+          if (isABMode && abGroup) {
+            e.preventDefault();
+            const hasC = abGroup.tracks.some(t => t.abVariant === 'C');
+            if (hasC) switchVariant('C');
+          }
+          break;
+
+        case 'KeyD':
+          if (isABMode && abGroup) {
+            e.preventDefault();
+            const hasD = abGroup.tracks.some(t => t.abVariant === 'D');
+            if (hasD) switchVariant('D');
+          }
+          break;
+
+        case 'Escape':
+          if (isABMode) {
+            e.preventDefault();
+            exitABMode();
+          }
+          break;
+
+        // ============================================
+        // REGULAR PLAYBACK SHORTCUTS
+        // ============================================
+        
         case 'Space':
           if (currentTrack) {
             e.preventDefault();
@@ -121,6 +174,11 @@ export function KeyboardShortcuts() {
     toggleShuffle,
     setCurrentTime,
     duration,
+    // A/B Mode dependencies
+    isABMode,
+    abGroup,
+    switchVariant,
+    exitABMode,
   ]);
 
   return null; // This component only handles keyboard events
