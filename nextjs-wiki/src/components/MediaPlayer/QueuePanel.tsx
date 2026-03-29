@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useMediaPlayerStore } from '@/lib/store';
 import FormatBadge from './FormatBadge';
 
@@ -135,9 +136,11 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
 
                     {/* Thumbnail */}
                     {track.thumbnail && (
-                      <img
+                      <Image
                         src={track.thumbnail}
                         alt={track.title}
+                        width={40}
+                        height={40}
                         className="w-10 h-10 rounded object-cover flex-shrink-0"
                       />
                     )}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import Image from 'next/image';
 import { useMediaPlayerStore } from '@/lib/store';
 import PlayerControls from './PlayerControls';
 import PlayerProgress from './PlayerProgress';
@@ -302,9 +303,11 @@ export default function MediaPlayer() {
           {/* Track Info */}
           <div className="flex items-center gap-2 mb-2">
             {currentTrack.thumbnail && (
-              <img 
+              <Image 
                 src={currentTrack.thumbnail} 
                 alt={currentTrack.title}
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded object-cover"
               />
             )}

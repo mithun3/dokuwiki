@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import FormatBadge from './FormatBadge';
 import { useMediaPlayerStore } from '@/lib/store';
 import { createABGroup } from '@/lib/abUtils';
@@ -52,20 +52,29 @@ export default function ABComparisonCard({
   variants,
   description,
 }: ABComparisonCardProps) {
+  const [mounted, setMounted] = useState(false);
   const { enterABMode, isABMode, abGroup, activeVariant, playTrack } = useMediaPlayerStore();
 
-  // Check if this comparison is currently active
-  const isThisActive = isABMode && abGroup?.baseName === title.toLowerCase().replace(/\s+/g, '-');
+  // Only render interactive elements after hydration (to avoid SSR issues with localStorage)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  // Extract format from first variant URL
-  const format = variants[0]?.url.split('.').pop()?.toLowerCase() || 'mp3';
+  // Provide safe defaults for variants
+  const safeVariants = variants || [];
+  
+  // Check if this comparison is currently active
+  const isThisActive = mounted && isABMode && abGroup?.baseName === title.toLowerCase().replace(/\s+/g, '-');
+
+  // Extract format from first variant URL (with safe access)
+  const format = safeVariants[0]?.url.split('.').pop()?.toLowerCase() || 'mp3';
 
   const defaultThumbnail = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
 
   const variantLabels: ABVariant[] = ['A', 'B', 'C', 'D'];
 
   const createTracksFromVariants = (): MediaTrack[] => {
-    return variants.map((v, i) => ({
+    return safeVariants.map((v, i) => ({
       id: `ab-${Date.now()}-${variantLabels[i]}-${Math.random().toString(36).substr(2, 9)}`,
       url: v.url,
       title: v.label,
@@ -118,8 +127,13 @@ export default function ABComparisonCard({
       </div>
 
       {/* Variants Grid */}
-      <div className="grid gap-3 p-4" style={{ gridTemplateColumns: `repeat(${Math.min(variants.length, 2)}, 1fr)` }}>
-        {variants.map((variant, index) => {
+      <div className="grid gap-3 p-4" style={{ gridTemplateColumns: `repeat(${Math.min(safeVariants.length, 2)}, 1fr)` }}>
+        {safeVariants.length === 0 ? (
+          <div className="col-span-full py-8 text-center text-gray-500">
+            <p>No variants available</p>
+          </div>
+        ) : (
+          safeVariants.map((variant, index) => {
           const variantLetter = variantLabels[index];
           const isActiveVariant = isThisActive && activeVariant === variantLetter;
           const variantThumbnail = variant.thumbnail || thumbnail;
@@ -180,7 +194,8 @@ export default function ABComparisonCard({
               </div>
             </div>
           );
-        })}
+          })
+        )}
       </div>
 
       {/* Action Button and Keyboard Hint */}
@@ -201,7 +216,7 @@ export default function ABComparisonCard({
 
         <div className="flex items-center gap-1 text-xs text-gray-500">
           <span>Keyboard:</span>
-          {variants.map((_, i) => (
+          {safeVariants.map((_, i) => (
             <kbd
               key={i}
               className="rounded border border-gray-300 bg-white px-1.5 py-0.5 font-mono text-gray-600"

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import type { MediaTrack } from '@/lib/types';
 
 interface QueueConflictModalProps {
@@ -64,9 +65,11 @@ export function QueueConflictModal({
               <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
                 <div className="flex items-start gap-3">
                   {currentTrack.thumbnail && (
-                    <img
+                    <Image
                       src={currentTrack.thumbnail}
                       alt={currentTrack.title}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded object-cover flex-shrink-0"
                     />
                   )}
@@ -95,9 +98,11 @@ export function QueueConflictModal({
               <div className="bg-gradient-to-r from-amber-50 to-orange-100 dark:from-amber-900/30 dark:to-orange-800/30 rounded-lg p-4 border border-amber-200 dark:border-orange-700">
                 <div className="flex items-start gap-3">
                   {newTrack.thumbnail && (
-                    <img
+                    <Image
                       src={newTrack.thumbnail}
                       alt={newTrack.title}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded object-cover flex-shrink-0"
                     />
                   )}
