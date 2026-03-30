@@ -409,7 +409,8 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
         playlist: state.playlist,
         currentIndex: state.currentIndex,
         currentTrack: state.currentTrack,
-        // Note: isPlaying and currentTime not persisted to avoid state desync
+        isPlaying: state.isPlaying,
+        currentTime: state.currentTime,
       }),
     }
   )

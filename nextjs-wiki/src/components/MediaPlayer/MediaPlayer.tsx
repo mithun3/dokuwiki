@@ -49,6 +49,7 @@ export default function MediaPlayer() {
   });
   
   const [isQueueOpen, setIsQueueOpen] = useState(false);
+  const [hasHydrated, setHasHydrated] = useState(false);
   
   const {
     currentTrack,
@@ -71,6 +72,52 @@ export default function MediaPlayer() {
   const mediaRef = currentTrack?.type === 'video' ? videoRef : audioRef;
 
   // ============================================
+  // HYDRATION: Restore playback state on mount
+  // ============================================
+  
+  /**
+   * Handle resuming playback when component mounts with persisted state
+   * This ensures music continues uninterrupted across page navigation
+   * or page reloads
+   */
+  useEffect(() => {
+    if (hasHydrated || !currentTrack || !mediaRef.current) return;
+    
+    const media = mediaRef.current;
+    
+    // Set up the media source and restore playback position
+    const handleCanPlay = () => {
+      // Only set currentTime after media is ready
+      if (currentTime > 0 && media.duration > 0) {
+        media.currentTime = Math.min(currentTime, media.duration - 0.1);
+      }
+      
+      // Resume playback if it was playing before
+      if (isPlaying) {
+        media.play().catch(err => {
+          // Autoplay might be blocked by browser
+          console.debug('Autoplay blocked, waiting for user interaction:', err);
+        });
+      }
+      
+      setHasHydrated(true);
+      media.removeEventListener('canplay', handleCanPlay);
+    };
+    
+    if (media.duration > 0) {
+      // Media is already loaded, apply immediately
+      handleCanPlay();
+    } else {
+      // Wait for media to load before applying currentTime
+      media.addEventListener('canplay', handleCanPlay);
+    }
+    
+    return () => {
+      media.removeEventListener('canplay', handleCanPlay);
+    };
+  }, [currentTrack, currentTime, isPlaying, hasHydrated]);
+
+  // ============================================
   // A/B MODE: Multi-Audio Element Management
   // ============================================
   
@@ -87,9 +134,26 @@ export default function MediaPlayer() {
         audioEl.volume = isMuted ? 0 : volume;
         // Mute all except active variant
         audioEl.muted = track.abVariant !== activeVariant;
+        
+        // Restore playback position from persisted state
+        const handleCanPlay = () => {
+          if (currentTime > 0 && audioEl.duration > 0) {
+            audioEl.currentTime = Math.min(currentTime, audioEl.duration - 0.1);
+          }
+          if (isPlaying) {
+            audioEl.play().catch(console.error);
+          }
+          audioEl.removeEventListener('canplay', handleCanPlay);
+        };
+        
+        if (audioEl.duration > 0) {
+          handleCanPlay();
+        } else {
+          audioEl.addEventListener('canplay', handleCanPlay);
+        }
       }
     });
-  }, [isABMode, abGroup]);
+  }, [isABMode, abGroup, currentTime, isPlaying, volume, isMuted, activeVariant]);
 
   // A/B Mode: Handle variant switching (mute/unmute)
   useEffect(() => {
