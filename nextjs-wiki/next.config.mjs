@@ -31,6 +31,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'media.sysya.com.au',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
   },
 };

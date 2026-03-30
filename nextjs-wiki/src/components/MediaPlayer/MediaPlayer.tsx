@@ -49,7 +49,8 @@ export default function MediaPlayer() {
   });
   
   const [isQueueOpen, setIsQueueOpen] = useState(false);
-  const [hasHydrated, setHasHydrated] = useState(false);
+  const [playerReady, setPlayerReady] = useState(false);
+  const [playbackRestored, setPlaybackRestored] = useState(false);
   
   const {
     currentTrack,
@@ -76,46 +77,74 @@ export default function MediaPlayer() {
   // ============================================
   
   /**
-   * Handle resuming playback when component mounts with persisted state
-   * This ensures music continues uninterrupted across page navigation
-   * or page reloads
+   * Track when audio/video element is ready for playback
+   * This is separate from the hydration logic to ensure proper timing
    */
   useEffect(() => {
-    if (hasHydrated || !currentTrack || !mediaRef.current) return;
+    if (!mediaRef.current) return;
     
     const media = mediaRef.current;
-    
-    // Set up the media source and restore playback position
     const handleCanPlay = () => {
-      // Only set currentTime after media is ready
-      if (currentTime > 0 && media.duration > 0) {
-        media.currentTime = Math.min(currentTime, media.duration - 0.1);
-      }
-      
-      // Resume playback if it was playing before
-      if (isPlaying) {
-        media.play().catch(err => {
-          // Autoplay might be blocked by browser
-          console.debug('Autoplay blocked, waiting for user interaction:', err);
-        });
-      }
-      
-      setHasHydrated(true);
+      setPlayerReady(true);
       media.removeEventListener('canplay', handleCanPlay);
     };
     
-    if (media.duration > 0) {
-      // Media is already loaded, apply immediately
-      handleCanPlay();
+    if (media.buffered.length > 0 || media.networkState >= 2) {
+      // Media is already loaded or loading
+      setPlayerReady(true);
     } else {
-      // Wait for media to load before applying currentTime
       media.addEventListener('canplay', handleCanPlay);
     }
     
     return () => {
       media.removeEventListener('canplay', handleCanPlay);
     };
-  }, [currentTrack, currentTime, isPlaying, hasHydrated]);
+  }, [currentTrack]);
+
+  /**
+   * Restore persisted playback position and state
+   * Runs once when both media is ready and we have a current track
+   */
+  useEffect(() => {
+    if (playbackRestored || !currentTrack || !mediaRef.current || !playerReady) {
+      return;
+    }
+    
+    const media = mediaRef.current;
+    
+    try {
+      // Set the playback position if we have one persisted
+      if (currentTime > 0 && media.duration > 0) {
+        const targetTime = Math.min(currentTime, media.duration - 0.1);
+        media.currentTime = targetTime;
+      }
+      
+      // Resume playback if it was playing
+      if (isPlaying) {
+        const playPromise = media.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(err => {
+            // Autoplay might be browser-blocked, that's ok
+            console.debug('Autoplay restricted by browser policy');
+          });
+        }
+      }
+      
+      setPlaybackRestored(true);
+    } catch (error) {
+      console.debug('Error restoring playback:', error);
+      setPlaybackRestored(true);
+    }
+  }, [currentTrack, currentTime, isPlaying, playerReady, playbackRestored]);
+
+  /**
+   * Reset playbackRestored when track ID changes
+   * This allows new tracks to get proper restoration
+   */
+  useEffect(() => {
+    setPlaybackRestored(false);
+    setPlayerReady(false);
+  }, [currentTrack?.id]);
 
   // ============================================
   // A/B MODE: Multi-Audio Element Management
