@@ -55,7 +55,7 @@ jobs:
 
   deploy-preview:
     needs: build-and-test
-    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref != 'refs/heads/main' && github.ref != 'refs/heads/migrate')
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main' && github.ref != 'refs/heads/migrate')
     runs-on: ubuntu-latest
     
     steps:
@@ -80,7 +80,7 @@ jobs:
 
   deploy-production:
     needs: build-and-test
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/migrate')
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/migrate'))
     runs-on: ubuntu-latest
     
     steps:
@@ -102,6 +102,8 @@ jobs:
       - name: Build for Production
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./nextjs-wiki
+        env:
+          NEXT_PUBLIC_CDN_URL: https://media.sysya.com.au
       
       - name: Deploy to Vercel (Production)
         run: vercel deploy --prebuilt --yes --prod --token=${{ secrets.VERCEL_TOKEN }}
