@@ -1,6 +1,7 @@
 {
   "name": "sysya-wiki",
   "version": 2,
+  "framework": "nextjs",
   "regions": ["syd1"],
   "github": {
     "enabled": true,
