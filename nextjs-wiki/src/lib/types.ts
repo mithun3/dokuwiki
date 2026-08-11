@@ -125,3 +125,101 @@ export interface ABParseResult {
   extension?: string;
 }
 
+// ============================================
+// MUSIC EXPORT TOOL TYPES
+// ============================================
+
+/**
+ * A single audio file path extracted from a playlist file (.m3u8 or .csv).
+ * These are local filesystem paths, NOT playback URLs.
+ *
+ * @interface ParsedTrack
+ * @property {string} sourcePath    - Raw filesystem path as found in the playlist,
+ *                                    e.g. "/Users/me/Music/song.mp3"
+ * @property {string} filename      - The basename only, used for display in the table,
+ *                                    e.g. "song.mp3"
+ * @property {'m3u8' | 'csv'}       detectedFrom - Which playlist format sourced this path
+ * @property {string}               playlistName  - Sanitized name of the source playlist
+ *                                                  file (without extension).
+ *                                                  Becomes the destination subfolder name.
+ *                                                  e.g. "My Summer Playlist" from
+ *                                                  "My Summer Playlist.m3u8"
+ */
+export interface ParsedTrack {
+  sourcePath: string;
+  filename: string;
+  detectedFrom: 'm3u8' | 'csv';
+  /** Sanitized playlist filename (no extension) — used as the destination subfolder name */
+  playlistName: string;
+}
+
+/**
+ * The outcome of a single file copy operation performed by the server.
+ *
+ * @interface CopyResult
+ * @property {string}  sourcePath - The source path that was attempted
+ * @property {boolean} success    - Whether the copy succeeded
+ * @property {string}  [error]    - Human-readable error message on failure.
+ *                                  Common values: "File not found on this machine",
+ *                                  "Permission denied", "Copy failed: ..."
+ */
+export interface CopyResult {
+  sourcePath: string;
+  /** Name of the playlist this track belongs to — same as the destination subfolder */
+  playlistName: string;
+  success: boolean;
+  /**
+   * True when fs.existsSync (or the FSA equivalent) confirmed the file exists
+   * at the destination immediately after copying.
+   * A copy can "succeed" at the OS level but fail verification on slow/network filesystems.
+   */
+  verified: boolean;
+  error?: string;
+}
+
+/**
+ * Shape of the JSON body sent to POST /api/export-music.
+ *
+ * @interface ExportJob
+ * @property tracks                 - Each track carries its source path AND the playlist
+ *                                    it belongs to. The server creates one subdirectory per
+ *                                    unique playlistName inside destinationDirectory.
+ * @property {string} destinationDirectory - Root target folder; created automatically.
+ */
+export interface ExportJob {
+  tracks: Array<{ sourcePath: string; playlistName: string }>;
+  destinationDirectory: string;
+}
+
+/**
+ * A single NDJSON event streamed back from POST /api/export-music.
+ * The client splits each chunk on '\n' and JSON-parses each line to
+ * update the progress bar and results lists in real time.
+ *
+ * Discriminated union on `type`:
+ *   'progress' — one file was processed (success or failure)
+ *   'done'     — all files have been processed; the stream is about to close
+ *   'error'    — a fatal server-side error occurred; the stream will close
+ */
+export type ExportProgressEvent =
+  | {
+      type: 'progress';
+      /** 1-based index of the file just processed */
+      current: number;
+      /** Total number of files in this batch */
+      total: number;
+      sourcePath: string;
+      /** The playlist name — matches the destination subfolder used */
+      playlistName: string;
+      success: boolean;
+      /**
+       * True when the file was confirmed to exist at the destination after copying.
+       * A separate fs.existsSync check after fs.copyFileSync provides this guarantee.
+       */
+      verified: boolean;
+      /** Present when success === false or verified === false */
+      error?: string;
+    }
+  | { type: 'done' }
+  | { type: 'error'; message: string };
+

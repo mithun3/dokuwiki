@@ -32,3 +32,9 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+
+scripts/export-memorial-*.js
+public/*
+exports/*
+content/memorial-invitation*
