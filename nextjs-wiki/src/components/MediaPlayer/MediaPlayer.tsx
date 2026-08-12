@@ -345,10 +345,10 @@ export default function MediaPlayer() {
             {!isABMode && (
               <button
                 onClick={() => setIsQueueOpen(!isQueueOpen)}
-                className="flex-shrink-0 p-2 hover:bg-gray-100 rounded transition text-gray-600"
+                className="flex-shrink-0 p-2 hover:bg-gray-100 rounded transition text-gray-600 font-medium text-sm"
                 title="Toggle queue"
               >
-                📋
+                Queue
               </button>
             )}
           </div>

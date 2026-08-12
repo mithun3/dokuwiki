@@ -185,7 +185,7 @@ export default function Sidebar() {
                       }
                     >
                       <span className="inline-block transition-transform">
-                        {isExpanded(item.href) ? '▼' : '▶'}
+                        {isExpanded(item.href) ? '▼' : '►'}
                       </span>
                     </button>
                   )}

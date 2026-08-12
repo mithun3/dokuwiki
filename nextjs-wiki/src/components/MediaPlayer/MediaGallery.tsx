@@ -153,7 +153,6 @@ export function MediaGallery({ filter = 'all', className = '', items = [] }: Med
             onClick={handlePlayAll}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
           >
-            <span>▶</span>
             <span>Play All</span>
           </button>
 
@@ -161,7 +160,6 @@ export function MediaGallery({ filter = 'all', className = '', items = [] }: Med
             onClick={handleShuffleAll}
             className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"
           >
-            <span>🔀</span>
             <span>Shuffle All</span>
           </button>
         </div>

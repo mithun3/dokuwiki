@@ -72,7 +72,7 @@ export function QueueConflictModal({
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">▶</span>
+                      <span className="text-lg">►</span>
                       <p className="font-medium text-gray-900 dark:text-white truncate">
                         {currentTrack.title}
                       </p>
@@ -128,7 +128,6 @@ export function QueueConflictModal({
               onClick={() => handleAction(onReplace)}
               className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              <span>⏹</span>
               <span>Replace & Play Now</span>
             </button>
 
@@ -137,7 +136,6 @@ export function QueueConflictModal({
               onClick={() => handleAction(onPlayNext)}
               className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              <span>⏭</span>
               <span>Play Next</span>
             </button>
 
@@ -146,7 +144,6 @@ export function QueueConflictModal({
               onClick={() => handleAction(onAddToQueue)}
               className="w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              <span>➕</span>
               <span>Add to Queue</span>
             </button>
 

@@ -51,8 +51,8 @@ export class ContentErrorBoundary extends Component<Props, State> {
       return (
         <div className="max-w-2xl mx-auto my-8 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <span className="text-2xl">⚠️</span>
+            <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-yellow-200">
+              <span className="text-xl font-bold text-yellow-700">!</span>
             </div>
             <div className="ml-3">
               <h3 className="text-lg font-medium text-yellow-900">

@@ -356,7 +356,7 @@ async function main() {
     const rawName      = path.basename(playlistPath, ext);
     const playlistName = rawName.replace(/[\/\\:*?"<>|\0]/g, '_').trim() || 'playlist';
 
-    console.log(`${C.bold}▶ Playlist:${C.reset} ${playlistName}`);
+    console.log(`${C.bold} Playlist:${C.reset} ${playlistName}`);
     console.log(`  ${C.grey}${playlistPath}${C.reset}`);
 
     // Parse the playlist
@@ -385,7 +385,7 @@ async function main() {
     for (const p of rawPaths) {
       const check = validatePath(p, 'source');
       if (!check.ok) {
-        console.warn(`  ${C.yellow}⚠ BLOCKED${C.reset}  ${path.basename(p)} — ${check.reason}`);
+        console.warn(`  ${C.yellow} BLOCKED${C.reset}  ${path.basename(p)} — ${check.reason}`);
         hadAnyFailure = true;
       } else {
         validPaths.push(p);
@@ -436,7 +436,7 @@ async function main() {
       } catch (err) {
         if (err.code === 'ENOENT') {
           // Source not on this machine — skip gracefully, not a hard failure
-          console.log(`  ${C.yellow}⚠ Skipped${C.reset}   ${filename} (not found on this machine)`);
+          console.log(`  ${C.yellow} Skipped${C.reset}   ${filename} (not found on this machine)`);
           skipped++;
         } else {
           console.log(`  ${C.red}✗ Failed${C.reset}    ${filename} (${err.message})`);
@@ -471,7 +471,7 @@ async function main() {
 
   // ── Zero-failure check ─────────────────────────────────────────────────────
   if (hadAnyFailure || totalFailed > 0) {
-    console.error(`${C.red}⚠  Exiting with code 1 — one or more issues detected.${C.reset}`);
+    console.error(`${C.red}  Exiting with code 1 — one or more issues detected.${C.reset}`);
     process.exit(1);
   }
 
