@@ -129,6 +129,16 @@ export function isSameABGroup(url1: string, url2: string): boolean {
  * @returns {ABTrack | null} ABTrack if valid A/B filename, null otherwise
  */
 export function convertToABTrack(track: MediaTrack, groupId: string): ABTrack | null {
+  // Check for HTML data-attribute explicit overrides first
+  if (track.abGroupOverride === groupId && track.abVariantOverride) {
+    return {
+      ...track,
+      abGroupId: groupId,
+      abVariant: track.abVariantOverride as ABVariant,
+    };
+  }
+
+  // Fallback to regex parsing
   const parsed = parseABFilename(track.url);
   
   if (!parsed.isABTrack || !parsed.variant) {
@@ -164,18 +174,31 @@ export function createABGroup(tracks: MediaTrack[]): ABTrackGroup | null {
     parsed: parseABFilename(track.url),
   }));
   
-  // Validate all are A/B tracks with same base name
-  const firstParsed = parsedTracks[0].parsed;
-  if (!firstParsed.isABTrack) {
-    return null;
-  }
-  
-  const baseName = firstParsed.baseName!;
-  const extension = firstParsed.extension!;
-  
-  for (const { parsed } of parsedTracks) {
-    if (!parsed.isABTrack || parsed.baseName !== baseName || parsed.extension !== extension) {
+  // Check if first track has an explicit override
+  const firstTrack = parsedTracks[0].track;
+  const explicitGroupName = firstTrack.abGroupOverride;
+
+  if (explicitGroupName) {
+    // If explicit group name is given, all tracks must match it
+    for (const { track } of parsedTracks) {
+      if (track.abGroupOverride !== explicitGroupName) {
+        return null;
+      }
+    }
+  } else {
+    // Fallback: Validate all are A/B tracks with same base name via regex
+    const firstParsed = parsedTracks[0].parsed;
+    if (!firstParsed.isABTrack) {
       return null;
+    }
+    
+    const parsedBaseName = firstParsed.baseName!;
+    const extension = firstParsed.extension!;
+    
+    for (const { parsed } of parsedTracks) {
+      if (!parsed.isABTrack || parsed.baseName !== parsedBaseName || parsed.extension !== extension) {
+        return null;
+      }
     }
   }
   
@@ -186,14 +209,18 @@ export function createABGroup(tracks: MediaTrack[]): ABTrackGroup | null {
   }
   
   // Generate group ID
+  const baseName = explicitGroupName || parsedTracks[0].parsed.baseName || 'custom-group';
   const groupId = `ab-${baseName}-${Date.now()}`;
   
+  // Available fallback variants if not explicitly provided
+  const availableVariants: ABVariant[] = ['A', 'B', 'C', 'D'];
+
   // Convert to ABTracks
   const abTracks: ABTrack[] = parsedTracks
-    .map(({ track, parsed }) => ({
+    .map(({ track, parsed }, idx) => ({
       ...track,
       abGroupId: groupId,
-      abVariant: parsed.variant!,
+      abVariant: (track.abVariantOverride as ABVariant) || parsed.variant || availableVariants[idx],
     }))
     .sort((a, b) => a.abVariant.localeCompare(b.abVariant));
   

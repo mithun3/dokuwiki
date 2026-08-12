@@ -78,6 +78,8 @@ export function MediaGallery({ filter = 'all', className = '', items = [] }: Med
           artist: link.dataset.artist,
           thumbnail: link.dataset.thumbnail,
           format: extension as any,
+          abGroupOverride: link.dataset.abGroup,
+          abVariantOverride: link.dataset.abVariant,
         };
 
         // Apply filter

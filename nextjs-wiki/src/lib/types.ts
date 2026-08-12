@@ -19,6 +19,17 @@ export interface MediaTrack {
   thumbnail?: string;
   duration?: number;
   format?: 'mp3' | 'wav' | 'ogg' | 'aac' | 'm4a' | 'opus' | 'flac' | 'mp4' | 'webm' | 'ogv';
+  
+  /** 
+   * Optional HTML data attribute override for A/B track grouping. 
+   * Useful when filename regex matching fails or when creating groups manually in markdown.
+   */
+  abGroupOverride?: string;
+  
+  /** 
+   * Optional HTML data attribute override for A/B variant (A, B, C, D). 
+   */
+  abVariantOverride?: string;
 }
 
 /**
@@ -51,6 +62,12 @@ export interface PlayerState {
   isMini: boolean;
   repeatMode: 'none' | 'all' | 'one';
   isShuffled: boolean;
+  
+  /** 
+   * A/B mode specific: Maps an ABVariant (e.g. 'A', 'B') to a dB offset (e.g. -2.5, +1.0)
+   * This is used to adjust perceptual loudness when comparing tracks. 
+   */
+  abVolumeOffsets: Record<string, number>;
 }
 
 /**

@@ -54,7 +54,6 @@ export default function MediaPlayer() {
     isPlaying,
     volume,
     isMuted,
-    currentTime,
     isVisible,
     isMini,
     setIsPlaying,
@@ -117,18 +116,34 @@ export default function MediaPlayer() {
 
   // A/B Mode: Play/pause all audio elements together
   useEffect(() => {
-    if (!isABMode || !abGroup) return;
+    // Add cleanup to pause everything if we exit A/B mode
+    if (!isABMode || !abGroup) {
+      Object.values(abAudioRefs.current).forEach(audioEl => {
+        if (audioEl) audioEl.pause();
+      });
+      return;
+    }
     
     abGroup.tracks.forEach(track => {
       const audioEl = abAudioRefs.current[track.abVariant];
       if (audioEl) {
         if (isPlaying) {
-          audioEl.play().catch(console.error);
+          audioEl.play().catch(() => {
+            // Ignore AbortError caused by rapid play/pause
+          });
         } else {
           audioEl.pause();
         }
       }
     });
+
+    // Explicitly pause on unmount or mode change
+    return () => {
+      abGroup.tracks.forEach(track => {
+        const audioEl = abAudioRefs.current[track.abVariant];
+        if (audioEl) audioEl.pause();
+      });
+    };
   }, [isPlaying, isABMode, abGroup]);
 
   // A/B Mode: Update time from active variant
@@ -140,8 +155,8 @@ export default function MediaPlayer() {
     
     const handleTimeUpdate = () => {
       setCurrentTime(activeAudio.currentTime);
-      // Keep other tracks in sync
-      syncABPositions(activeAudio.currentTime);
+      // REMOVED syncABPositions here to prevent audio stuttering during active playback
+      // Synchronization is handled during seeking and switching variants.
     };
     
     const handleLoadedMetadata = () => {
@@ -165,18 +180,24 @@ export default function MediaPlayer() {
     };
   }, [isABMode, abGroup, activeVariant, setCurrentTime, setDuration, setIsPlaying, syncABPositions]);
 
-  // A/B Mode: Volume control for all elements
+  // A/B Mode: Volume control with dB Level Matching
   useEffect(() => {
     if (!isABMode || !abGroup) return;
     
+    const { abVolumeOffsets } = useMediaPlayerStore.getState();
     const effectiveVolume = isMuted ? 0 : volume;
+    
     abGroup.tracks.forEach(track => {
       const audioEl = abAudioRefs.current[track.abVariant];
       if (audioEl) {
-        audioEl.volume = effectiveVolume;
+        const offsetDb = abVolumeOffsets[track.abVariant] || 0;
+        // Convert dB to linear scale multiplier (10^(dB/20))
+        const linearMultiplier = Math.pow(10, offsetDb / 20);
+        
+        audioEl.volume = Math.max(0, Math.min(1, effectiveVolume * linearMultiplier));
       }
     });
-  }, [volume, isMuted, isABMode, abGroup]);
+  }, [volume, isMuted, isABMode, abGroup, useMediaPlayerStore(state => state.abVolumeOffsets)]);
 
   // ============================================
   // REGULAR MODE: Single Audio/Video Element
@@ -215,7 +236,7 @@ export default function MediaPlayer() {
 
     media.src = currentTrack.url;
     media.load();
-    media.currentTime = currentTime;
+    media.currentTime = useMediaPlayerStore.getState().currentTime;
     
     if (isPlaying) {
       media.play().catch(console.error);
