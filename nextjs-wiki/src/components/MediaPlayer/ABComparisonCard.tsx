@@ -49,7 +49,7 @@ interface ABComparisonCardProps {
 export default function ABComparisonCard({
   title,
   thumbnail,
-  variants,
+  variants = [],
   description,
 }: ABComparisonCardProps) {
   const { enterABMode, isABMode, abGroup, activeVariant, playTrack } = useMediaPlayerStore();
@@ -58,7 +58,7 @@ export default function ABComparisonCard({
   const isThisActive = isABMode && abGroup?.baseName === title.toLowerCase().replace(/\s+/g, '-');
 
   // Extract format from first variant URL
-  const format = variants[0]?.url.split('.').pop()?.toLowerCase() || 'mp3';
+  const format = variants?.[0]?.url?.split('.').pop()?.toLowerCase() || 'mp3';
 
   const defaultThumbnail = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
 

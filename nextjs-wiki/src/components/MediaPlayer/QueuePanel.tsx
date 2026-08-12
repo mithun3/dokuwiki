@@ -80,10 +80,10 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
             {playlist.length > 0 && (
               <button
                 onClick={() => clearPlaylist()}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 text-sm"
                 title="Clear queue"
               >
-                🗑️
+                Clear
               </button>
             )}
             <button
@@ -100,7 +100,6 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
         <div className="flex-1 overflow-y-auto">
           {playlist.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <p className="text-lg">📭</p>
               <p className="mt-2">Queue is empty</p>
             </div>
           ) : (
@@ -125,7 +124,7 @@ export function QueuePanel({ isOpen, onClose }: QueuePanelProps) {
                     {/* Index or Playing Indicator */}
                     <div className="flex-shrink-0 w-8 text-center">
                       {isCurrentTrack ? (
-                        <span className="text-lg">▶</span>
+                        <span className="text-lg">►</span>
                       ) : isPastTrack ? (
                         <span className="text-sm text-gray-400">✓</span>
                       ) : (

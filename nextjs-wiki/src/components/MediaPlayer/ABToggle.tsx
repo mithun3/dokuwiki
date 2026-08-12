@@ -25,6 +25,8 @@ export function ABToggle() {
     activeVariant,
     switchVariant,
     exitABMode,
+    abVolumeOffsets,
+    setABVolumeOffset,
   } = useMediaPlayerStore();
 
   if (!isABMode || !abGroup) {
@@ -33,6 +35,9 @@ export function ABToggle() {
 
   // Get available variants from the group
   const availableVariants = abGroup.tracks.map(t => t.abVariant).sort();
+  
+  // Get active track's volume offset
+  const activeVolumeDb = abVolumeOffsets[activeVariant] || 0;
 
   return (
     <div className="ab-toggle flex items-center gap-2 p-2 bg-gray-100 rounded-lg">
@@ -51,6 +56,27 @@ export function ABToggle() {
             onClick={() => switchVariant(variant)}
           />
         ))}
+      </div>
+
+      {/* Separator */}
+      <div className="w-px h-6 bg-gray-300 mx-1" />
+
+      {/* Level Matcher */}
+      <div className="flex items-center gap-2 px-2 border-l border-gray-300">
+        <span className="text-xs text-gray-500 font-medium">Gain</span>
+        <input
+          type="range"
+          min="-12"
+          max="12"
+          step="0.5"
+          value={activeVolumeDb}
+          onChange={(e) => setABVolumeOffset(activeVariant, parseFloat(e.target.value))}
+          className="w-20 h-1 bg-gray-300 rounded-lg appearance-none cursor-pointer"
+          title="Match output levels (±12dB)"
+        />
+        <span className="text-xs font-mono text-gray-500 w-9">
+          {activeVolumeDb > 0 ? '+' : ''}{activeVolumeDb}dB
+        </span>
       </div>
 
       {/* Separator */}
