@@ -113,7 +113,7 @@ export default function ArticleFooter({ metadata }: { metadata: ArticleMetadata 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline text-xs"
           >
-            <span>📝 View edit history on GitHub</span>
+            <span> View edit history on GitHub</span>
             <svg
               className="w-3 h-3"
               fill="none"

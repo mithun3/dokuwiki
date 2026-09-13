@@ -2,21 +2,21 @@
 
 This document guides you through migrating from the DokuWiki (PHP + AWS ECS) setup to the new Next.js-based wiki with persistent media player.
 
-## 🎯 Migration Overview
+##  Migration Overview
 
 **From:** DokuWiki on AWS ECS Fargate (~$117/month)  
 **To:** Next.js on Vercel ($0/month)  
 **Estimated Time:** 4-6 hours  
 **Cost Savings:** ~$1,404/year
 
-## 📋 Prerequisites
+##  Prerequisites
 
 - Node.js 18+ installed
 - Git repository access
 - Vercel account (free tier)
 - Pandoc installed (for content conversion)
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Step 1: Install Dependencies
 
@@ -54,30 +54,30 @@ Visit http://localhost:3000 to preview the site.
 2. Click on any media link to start playback
 3. Verify the player appears at the bottom-right
 4. Test playback controls: play/pause, skip, volume, seek
-5. Navigate to another page - music should continue playing ✨
+5. Navigate to another page - music should continue playing 
 6. Click another media link - it should queue or replace (configurable)
 7. Test shuffle and repeat modes
 8. Refresh page - player state persists from localStorage
 
-## 🎵 Media Player Features
+##  Media Player Features
 
 ### Implemented Features
 
-- ✅ **Persistent Playback** - Audio continues across page navigations (using Next.js client-side routing)
-- ✅ **Fixed Position** - Player stays at bottom of viewport
-- ✅ **Playlist Management** - Queue multiple tracks
-- ✅ **localStorage Persistence** - State survives page refreshes
-- ✅ **Auto Link Interception** - Clicks on media files load into player
-- ✅ **Volume Control** - Adjustable volume with mute
-- ✅ **Playback Controls** - Play, pause, skip, seek
-- ✅ **Shuffle & Repeat** - Playlist modes
-- ✅ **Audio & Video Support** - MP3, WAV, OGG, AAC, M4A, OPUS, FLAC, MP4, WebM, OGV
-- ✅ **Format Badges** - Visual format tags (mp3, mp4, etc.)
-- ✅ **Thumbnail Support** - Optional preview images for media files
-- ✅ **AudioCard Component** - Professional card UI for single audio tracks with Play/Queue buttons
-- ✅ **VideoCard Component** - Professional card UI for video content with 16:9 thumbnails
-- ✅ **A/B Comparison Mode** - Instant switching between audio variants for comparisons
-- ✅ **ABComparisonCard Component** - Unified A/B comparison UI with variant toggles
+-  **Persistent Playback** - Audio continues across page navigations (using Next.js client-side routing)
+-  **Fixed Position** - Player stays at bottom of viewport
+-  **Playlist Management** - Queue multiple tracks
+-  **localStorage Persistence** - State survives page refreshes
+-  **Auto Link Interception** - Clicks on media files load into player
+-  **Volume Control** - Adjustable volume with mute
+-  **Playback Controls** - Play, pause, skip, seek
+-  **Shuffle & Repeat** - Playlist modes
+-  **Audio & Video Support** - MP3, WAV, OGG, AAC, M4A, OPUS, FLAC, MP4, WebM, OGV
+-  **Format Badges** - Visual format tags (mp3, mp4, etc.)
+-  **Thumbnail Support** - Optional preview images for media files
+-  **AudioCard Component** - Professional card UI for single audio tracks with Play/Queue buttons
+-  **VideoCard Component** - Professional card UI for video content with 16:9 thumbnails
+-  **A/B Comparison Mode** - Instant switching between audio variants for comparisons
+-  **ABComparisonCard Component** - Unified A/B comparison UI with variant toggles
 
 ### How It Works
 
@@ -238,7 +238,7 @@ The A/B mode uses **multiple hidden audio elements** that play simultaneously (m
 - `src/components/MediaPlayer/ABToggle.tsx` - UI toggle component
 - `src/components/MediaPlayer/KeyboardShortcuts.tsx` - Keyboard handlers
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 nextjs-wiki/
@@ -289,7 +289,7 @@ nextjs-wiki/
 └── tailwind.config.ts
 ```
 
-## 🎨 Customization
+##  Customization
 
 ### Adding New Pages
 
@@ -328,7 +328,7 @@ const navigationItems = [
 - **Tailwind config:** `tailwind.config.ts`
 - **Component styles:** Inline Tailwind classes
 
-## ⌨️ Keyboard Shortcuts
+##  Keyboard Shortcuts
 
 The media player supports the following keyboard shortcuts for hands-free control:
 
@@ -349,7 +349,7 @@ The media player supports the following keyboard shortcuts for hands-free contro
 - Typing in text inputs or textareas disables shortcuts
 - All shortcuts are non-blocking and can be tested immediately
 
-## 🔍 Search Implementation (Optional)
+##  Search Implementation (Optional)
 
 Two recommended options:
 
@@ -375,7 +375,7 @@ Add to `package.json`:
 3. Index your content during build
 4. Add search component to layout
 
-## 📦 Deployment to Vercel
+##  Deployment to Vercel
 
 ### Step 1: Connect to GitHub
 
@@ -427,7 +427,7 @@ Click "Deploy" and wait 2-3 minutes. Vercel will:
 - Add CNAME: `sysya.com.au` → `cname.vercel-dns.com`
 - Wait for DNS propagation (5-60 minutes)
 
-## 🧪 Testing Checklist
+##  Testing Checklist
 
 Before going live:
 
@@ -442,7 +442,7 @@ Before going live:
 - [ ] 404 page displays for invalid routes
 - [ ] Performance: Lighthouse score > 90
 
-## 🔄 Content Updates Workflow
+##  Content Updates Workflow
 
 ### Before (DokuWiki):
 1. SSH into ECS container or use ECS Exec
@@ -457,7 +457,7 @@ Before going live:
 
 **No SSH, no containers, no manual syncing!**
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Player doesn't appear
 - Check browser console for errors
@@ -479,7 +479,7 @@ Before going live:
 - Check all imports are correct
 - Verify all dependencies are installed
 
-## 📊 Performance Comparison
+##  Performance Comparison
 
 | Metric | DokuWiki (AWS) | Next.js (Vercel) | Improvement |
 |--------|----------------|------------------|-------------|
@@ -489,7 +489,7 @@ Before going live:
 | **Deploy Time** | ~10min | ~2min | 5x faster |
 | **Global CDN** | CloudFront only | Yes (150+ locations) | Better |
 
-## 🔐 Security
+##  Security
 
 ### DokuWiki (Before)
 - PHP vulnerabilities
@@ -503,14 +503,14 @@ Before going live:
 - Vercel's DDoS protection
 - Automatic security headers
 
-## 🎯 Next Steps
+##  Next Steps
 
 1. **Merge to main:** Once tested, merge `migrate` branch
 2. **Tag release:** `git tag v2.0.0-nextjs`
 3. **Decommission AWS:** Follow `AWS-DECOMMISSION.md`
 4. **Set up analytics:** Add Vercel Analytics or Google Analytics
 
-## 🧪 Testing
+##  Testing
 
 ### Running Tests
 
@@ -549,7 +549,7 @@ describe('MyComponent', () => {
 });
 ```
 
-## 👨‍💻 Development Setup
+## ‍ Development Setup
 
 ### Local Development
 
@@ -585,7 +585,7 @@ npm run lint
 5. Create tests in `__tests__/`
 6. Update README if user-facing
 
-## 🔌 API Reference
+##  API Reference
 
 ### useMediaPlayerStore Hook
 
@@ -652,7 +652,7 @@ import { getAllContentSlugs } from '@/lib/content';
 const allPages = getAllContentSlugs(); // Returns: [['home'], ['about'], ...]
 ```
 
-## 📊 Environment Variables
+##  Environment Variables
 
 Create a `.env.local` file in the `nextjs-wiki` directory:
 
@@ -667,7 +667,7 @@ NEXT_PUBLIC_CDN_URL=https://media.example.com
 
 See `.env.example` for complete documentation.
 
-## 📚 Resources
+##  Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Vercel Documentation](https://vercel.com/docs)
@@ -676,7 +676,7 @@ See `.env.example` for complete documentation.
 - [Tailwind CSS](https://tailwindcss.com/docs)
 - [Vitest Testing](https://vitest.dev/)
 
-## 🤝 Support
+##  Support
 
 Questions or issues? Check:
 1. This README
