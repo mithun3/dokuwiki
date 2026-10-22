@@ -57,6 +57,12 @@ interface MediaPlayerStore extends PlayerState {
   enterABMode: (group: ABTrackGroup) => void;
   exitABMode: () => void;
   switchVariant: (variant: ABVariant) => void;
+  
+  /**
+   * Sets the volume offset (in dB) for a specific A/B variant.
+   * Used for manual perceptual level matching.
+   */
+  setABVolumeOffset: (variant: ABVariant, offsetDb: number) => void;
 }
 
 /**
@@ -108,6 +114,7 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
       isABMode: false,
       abGroup: null,
       activeVariant: 'A' as ABVariant,
+      abVolumeOffsets: {},
 
       // State setters
       /** Sets the currently playing track */
@@ -398,6 +405,20 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
           // currentTime is preserved - MediaPlayer will sync audio elements
         });
       },
+      
+      /**
+       * Set the dB volume offset for an A/B variant to match levels
+       * @param {ABVariant} variant - Target variant (A, B, C, or D)
+       * @param {number} offsetDb - Gain offset in decibels (e.g. -2.5)
+       */
+      setABVolumeOffset: (variant, offsetDb) => {
+        set((state) => ({
+          abVolumeOffsets: {
+            ...state.abVolumeOffsets,
+            [variant]: offsetDb,
+          },
+        }));
+      },
     }),
     {
       name: 'media-player-storage',
@@ -409,6 +430,7 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
         playlist: state.playlist,
         currentIndex: state.currentIndex,
         currentTrack: state.currentTrack,
+        abVolumeOffsets: state.abVolumeOffsets,
         // Note: isPlaying and currentTime not persisted to avoid state desync
       }),
     }

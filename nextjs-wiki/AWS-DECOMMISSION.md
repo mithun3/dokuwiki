@@ -2,7 +2,7 @@
 
 This guide walks you through safely decommissioning the DokuWiki AWS infrastructure after migrating to Next.js on Vercel.
 
-## ⚠️ Pre-Decommission Checklist
+##  Pre-Decommission Checklist
 
 **DO NOT proceed until ALL items are checked:**
 
@@ -15,25 +15,25 @@ This guide walks you through safely decommissioning the DokuWiki AWS infrastruct
 - [ ] Backup of all EFS data has been taken
 - [ ] Final backup has been uploaded to S3
 
-## 📊 Current AWS Resources
+##  Current AWS Resources
 
 Your infrastructure includes:
 
 | Resource | Purpose | Monthly Cost | Can Delete? |
 |----------|---------|--------------|-------------|
-| **VPC + Subnets** | Network | ~$0 | ✅ Yes |
-| **NAT Gateway (2x)** | Private subnet egress | ~$65 | ✅ Yes |
-| **Application Load Balancer** | HTTP/HTTPS routing | ~$22 | ✅ Yes |
-| **ECS Fargate Cluster** | PHP runtime | ~$18 | ✅ Yes |
-| **EFS File System** | DokuWiki data | ~$3 | ⚠️ After backup |
-| **S3 Media Bucket** | Large media files | ~$1 | ❌ Keep (in use) |
-| **CloudFront Distribution** | Media CDN | ~$1 | ❌ Keep (in use) |
-| **Route53 Hosted Zone** | DNS | ~$0.50 | ⚠️ Optional |
-| **ECR Repository** | Docker images | ~$0.50 | ✅ Yes |
-| **CloudWatch Logs** | ECS logs | ~$0.50 | ✅ Yes (auto-deleted) |
-| **ACM Certificates** | SSL certs | $0 | ✅ Yes (auto-deleted) |
+| **VPC + Subnets** | Network | ~$0 |  Yes |
+| **NAT Gateway (2x)** | Private subnet egress | ~$65 |  Yes |
+| **Application Load Balancer** | HTTP/HTTPS routing | ~$22 |  Yes |
+| **ECS Fargate Cluster** | PHP runtime | ~$18 |  Yes |
+| **EFS File System** | DokuWiki data | ~$3 |  After backup |
+| **S3 Media Bucket** | Large media files | ~$1 |  Keep (in use) |
+| **CloudFront Distribution** | Media CDN | ~$1 |  Keep (in use) |
+| **Route53 Hosted Zone** | DNS | ~$0.50 |  Optional |
+| **ECR Repository** | Docker images | ~$0.50 |  Yes |
+| **CloudWatch Logs** | ECS logs | ~$0.50 |  Yes (auto-deleted) |
+| **ACM Certificates** | SSL certs | $0 |  Yes (auto-deleted) |
 
-## 🗄️ Step 1: Final Backup (CRITICAL)
+##  Step 1: Final Backup (CRITICAL)
 
 ### Backup EFS Data
 
@@ -73,7 +73,7 @@ The backup should include:
 
 **Store this backup safely** - it's your rollback option if needed.
 
-## 🚫 Step 2: Stop ECS Service
+##  Step 2: Stop ECS Service
 
 Before destroying infrastructure, gracefully stop the service:
 
@@ -94,7 +94,7 @@ aws ecs wait services-stable \
 
 This prevents new connections and allows existing requests to complete.
 
-## 🔥 Step 3: Terraform Destroy
+##  Step 3: Terraform Destroy
 
 ### Option A: Full Destroy (Recommended after 2 weeks)
 
@@ -109,17 +109,17 @@ terraform destroy -auto-approve
 ```
 
 This will remove:
-- ✅ ECS Cluster, Service, Tasks
-- ✅ EFS File System and Mount Targets
-- ✅ Application Load Balancer
-- ✅ NAT Gateways
-- ✅ VPC, Subnets, Internet Gateway
-- ✅ Security Groups
-- ✅ IAM Roles
-- ✅ CloudWatch Log Groups
-- ✅ ACM Certificates
-- ✅ ECR Repository
-- ⚠️ S3/CloudFront (handled separately)
+-  ECS Cluster, Service, Tasks
+-  EFS File System and Mount Targets
+-  Application Load Balancer
+-  NAT Gateways
+-  VPC, Subnets, Internet Gateway
+-  Security Groups
+-  IAM Roles
+-  CloudWatch Log Groups
+-  ACM Certificates
+-  ECR Repository
+-  S3/CloudFront (handled separately)
 
 **Expected Duration:** 5-10 minutes
 
@@ -157,14 +157,14 @@ aws ecs update-service \
 aws backup delete-backup-vault --backup-vault-name dokuwiki-backup-vault || true
 ```
 
-## 📦 Step 4: Handle S3 and CloudFront
+##  Step 4: Handle S3 and CloudFront
 
 ### Keep Media CDN (Recommended)
 
 If your Next.js site references media files from `media.sysya.com.au`, **KEEP** these resources:
 
-- ✅ S3 bucket for media files (~$1-2/month)
-- ✅ CloudFront distribution (~$1/month)
+-  S3 bucket for media files (~$1-2/month)
+-  CloudFront distribution (~$1/month)
 
 ### Clean Up Unused Files
 
@@ -234,7 +234,7 @@ aws s3 rm s3://dokuwiki-media-example/ --recursive
 aws s3 rb s3://dokuwiki-media-example/ --force
 ```
 
-## 🌐 Step 5: DNS Migration
+##  Step 5: DNS Migration
 
 ### Option A: Move to Vercel DNS (Recommended)
 
@@ -273,7 +273,7 @@ If you prefer Route53 DNS:
 
 2. Keep hosted zone (minimal cost)
 
-## 🧹 Step 6: Clean Up Terraform State
+##  Step 6: Clean Up Terraform State
 
 ```bash
 cd infra/
@@ -292,7 +292,7 @@ rm -rf .terraform/
 rm terraform.tfstate*
 ```
 
-## 💰 Cost Verification
+##  Cost Verification
 
 ### Before Decommission
 ```bash
@@ -321,7 +321,7 @@ Expected remaining costs:
 - Route53 (if kept): ~$0.50/month
 - **Total: $2-4/month** (vs $117/month before)
 
-## 🔍 Step 7: Verification Checklist
+##  Step 7: Verification Checklist
 
 - [ ] Vercel site is fully operational
 - [ ] DNS resolves to Vercel (`dig sysya.com.au`)
@@ -334,7 +334,7 @@ Expected remaining costs:
 - [ ] CloudWatch Logs stopped accumulating
 - [ ] Backup downloaded and stored safely
 
-## 🚨 Rollback Procedure (Emergency)
+##  Rollback Procedure (Emergency)
 
 If you need to rollback:
 
@@ -368,7 +368,7 @@ If you need to rollback:
 
 **Rollback window:** 30 days (keep backups for 30 days minimum)
 
-## 📅 Recommended Timeline
+##  Recommended Timeline
 
 | Day | Action | Duration |
 |-----|--------|----------|
@@ -380,7 +380,7 @@ If you need to rollback:
 | **Day 14** | Clean up Route53, state backend (optional) | 30 min |
 | **Day 30** | Archive final backup, delete old logs | 30 min |
 
-## 📊 Expected Cost Savings
+##  Expected Cost Savings
 
 | Resource | Before | After | Savings |
 |----------|--------|-------|---------|
@@ -399,18 +399,18 @@ If you need to rollback:
 
 **Annual Savings: $1,380**
 
-## 🎯 Success Criteria
+##  Success Criteria
 
 Decommission is successful when:
 
-1. ✅ Next.js site is fully operational on Vercel
-2. ✅ Zero AWS compute charges (ECS, ALB, NAT)
-3. ✅ Only S3/CloudFront charges remain (~$2/month)
-4. ✅ All backups are safely stored
-5. ✅ Terraform state is clean
-6. ✅ No orphaned resources remain
+1.  Next.js site is fully operational on Vercel
+2.  Zero AWS compute charges (ECS, ALB, NAT)
+3.  Only S3/CloudFront charges remain (~$2/month)
+4.  All backups are safely stored
+5.  Terraform state is clean
+6.  No orphaned resources remain
 
-## 🤝 Support
+##  Support
 
 If you encounter issues:
 
@@ -419,7 +419,7 @@ If you encounter issues:
 3. Verify resource dependencies (some resources must be deleted in order)
 4. Contact AWS Support for stuck resources
 
-## 📚 Additional Resources
+##  Additional Resources
 
 - [AWS Cost Optimization Best Practices](https://aws.amazon.com/pricing/cost-optimization/)
 - [Terraform Destroy Documentation](https://www.terraform.io/docs/commands/destroy.html)

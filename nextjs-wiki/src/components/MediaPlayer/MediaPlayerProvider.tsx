@@ -80,18 +80,24 @@ export function MediaPlayerProvider({ children }: { children: React.ReactNode })
           artist: link.dataset.artist,
           thumbnail: link.dataset.thumbnail,
           format,
+          abGroupOverride: link.dataset.abGroup,
+          abVariantOverride: link.dataset.abVariant,
         };
         
         // Check if this is an A/B track
         const abParsed = parseABFilename(href);
+        const isExplicitAB = !!track.abGroupOverride;
         
-        if (abParsed.isABTrack && !isVideo) {
+        if ((abParsed.isABTrack || isExplicitAB) && !isVideo) {
           // A/B track detected - check if we should start comparison mode
           
           // If currently playing an A/B track from same group, offer comparison
-          if (currentTrack && isSameABGroup(currentTrack.url, href)) {
+          const isSameGroupRegex = currentTrack && isSameABGroup(currentTrack.url, href);
+          const isSameGroupExplicit = currentTrack && currentTrack.abGroupOverride && currentTrack.abGroupOverride === track.abGroupOverride;
+
+          if (isSameGroupRegex || isSameGroupExplicit) {
             // Found matching A/B pair - enter comparison mode
-            const group = createABGroup([currentTrack, track]);
+            const group = createABGroup([currentTrack!, track]);
             if (group) {
               enterABMode(group);
               return;

@@ -23,6 +23,10 @@ describe('Media Player Store', () => {
         currentTrack: null,
         newTrack: null,
       },
+      isABMode: false,
+      abGroup: null,
+      activeVariant: 'A',
+      abVolumeOffsets: {},
     });
   });
 
@@ -262,6 +266,68 @@ describe('Media Player Store', () => {
       store.playNext();
       // Just verify it changed to a different index (could be 1 or 2)
       expect(useMediaPlayerStore.getState().currentIndex).not.toBe(0);
+    });
+  });
+
+  describe('A/B Comparison Mode', () => {
+    const mockABGroup = {
+      id: 'ab-group-1',
+      baseName: 'test',
+      tracks: [
+        { ...mockTrack, abGroupId: 'ab-group-1', abVariant: 'A' as const },
+        { ...mockTrack2, abGroupId: 'ab-group-1', abVariant: 'B' as const },
+      ],
+    };
+
+    it('should enter A/B mode and clear playlist', () => {
+      const store = useMediaPlayerStore.getState();
+      // Setup some playlist state first
+      store.setPlaylist([mockTrack]);
+      
+      store.enterABMode(mockABGroup);
+      
+      const state = useMediaPlayerStore.getState();
+      expect(state.isABMode).toBe(true);
+      expect(state.abGroup).toEqual(mockABGroup);
+      expect(state.activeVariant).toBe('A');
+      expect(state.playlist).toEqual([]);
+      expect(state.isVisible).toBe(true);
+    });
+
+    it('should exit A/B mode', () => {
+      const store = useMediaPlayerStore.getState();
+      store.enterABMode(mockABGroup);
+      store.exitABMode();
+      
+      const state = useMediaPlayerStore.getState();
+      expect(state.isABMode).toBe(false);
+      expect(state.abGroup).toBeNull();
+      expect(state.isPlaying).toBe(false);
+      expect(state.currentTrack).toBeNull();
+    });
+
+    it('should switch variants', () => {
+      const store = useMediaPlayerStore.getState();
+      store.enterABMode(mockABGroup);
+      store.switchVariant('B');
+      
+      const state = useMediaPlayerStore.getState();
+      expect(state.activeVariant).toBe('B');
+      expect(state.currentTrack?.abVariant).toBe('B');
+    });
+
+    it('should set and persist volume offsets', () => {
+      const store = useMediaPlayerStore.getState();
+      
+      // Set offset for variant B
+      store.setABVolumeOffset('B', -2.5);
+      
+      const state = useMediaPlayerStore.getState();
+      expect(state.abVolumeOffsets['B']).toBe(-2.5);
+      
+      // Update offset
+      store.setABVolumeOffset('B', 1.0);
+      expect(useMediaPlayerStore.getState().abVolumeOffsets['B']).toBe(1.0);
     });
   });
 });
